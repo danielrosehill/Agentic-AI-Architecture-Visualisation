@@ -3,7 +3,7 @@
   "meta": {
     "title": "Agentic AI Architecture Map",
     "description": "A map of all the moving pieces in a production agentic AI system",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "author": "Daniel Rosehill / Carrot Cake AI",
     "license": "MIT"
   },
@@ -69,7 +69,7 @@
       "position": "center",
       "order": 3,
       "color": "#6366f1",
-      "description": "Where and how models are served — the compute layer. In production, requests often route through a model gateway before reaching the endpoint.",
+      "description": "Where and how models are served — the compute layer. A model gateway is optional: requests can route through a gateway for unified routing, or call endpoints directly.",
       "nodes": [
         {
           "id": "model-gateway",
@@ -185,11 +185,6 @@
           "description": "Connections to your data — Salesforce, HubSpot, Google Drive, Notion — via authenticated MCP servers."
         },
         {
-          "id": "search-apis",
-          "label": "Search APIs",
-          "description": "Web search, news feeds, and real-time data — typically API-key-based MCP integrations."
-        },
-        {
           "id": "external-services",
           "label": "External Services",
           "description": "Third-party services and public integrations — weather, time, public datasets."
@@ -204,7 +199,7 @@
     {
       "id": "storage",
       "label": "Storage",
-      "position": "center",
+      "position": "left",
       "order": 9,
       "color": "#14b8a6",
       "description": "Persistence layer — where conversations, outputs, and prompt templates are stored.",
@@ -311,6 +306,22 @@
       "sub_items": ["Eval", "Logging", "Monitoring"]
     },
     {
+      "id": "grounding",
+      "label": "Grounding",
+      "position": "left",
+      "order": 5,
+      "color": "#0891b2",
+      "description": "Real-time external data sources that ground agent responses in current information — web search, news feeds, and live data APIs.",
+      "nodes": [
+        {
+          "id": "grounding-card",
+          "label": "Grounding",
+          "description": "External data sources that ground agent responses in current, real-world information."
+        }
+      ],
+      "sub_items": ["Web Search", "News Feeds", "Real-Time Data"]
+    },
+    {
       "id": "destinations",
       "label": "Destinations",
       "position": "left",
@@ -373,6 +384,24 @@
       "to": "self-hosted",
       "color": "#6366f1",
       "description": "Gateway routes to self-hosted model endpoints. A self-hosted LiteLLM instance can route to local vLLM/TGI/Ollama servers alongside cloud APIs, providing unified access."
+    },
+    {
+      "id": "direct-to-cloud-apis",
+      "from": "models",
+      "to": "cloud-apis",
+      "color": "#6366f1",
+      "style": "dashed",
+      "label": "DIRECT",
+      "description": "Direct inference path bypassing the gateway — agents call cloud API endpoints directly without routing through a model gateway."
+    },
+    {
+      "id": "direct-to-self-hosted",
+      "from": "models",
+      "to": "self-hosted",
+      "color": "#6366f1",
+      "style": "dashed",
+      "label": "DIRECT",
+      "description": "Direct inference path bypassing the gateway — agents call self-hosted model endpoints directly without routing through a model gateway."
     },
     {
       "id": "inference-to-agents",
@@ -506,6 +535,15 @@
       "label": "AD-HOC MEMORY",
       "description": "Agents directly create and retrieve memory artifacts during execution. Unlike mined memory (a transport layer), the agent itself decides what to remember and when to recall it. Example: Claude Code writing and reading MEMORY.md files.",
       "invocation_pattern": "bidirectional"
+    },
+    {
+      "id": "grounding-to-agents",
+      "from": "grounding-card",
+      "to": "agents",
+      "color": "#0891b2",
+      "style": "dashed",
+      "label": "GROUNDING",
+      "description": "Real-time external data — web search results, news feeds, live APIs — grounds agent responses in current information."
     },
     {
       "id": "output-flow",
