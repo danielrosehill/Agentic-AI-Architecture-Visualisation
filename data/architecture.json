@@ -1,0 +1,450 @@
+{
+  "$schema": "./schema.json",
+  "meta": {
+    "title": "Agentic AI Architecture Map",
+    "description": "A map of all the moving pieces in a production agentic AI system",
+    "version": "1.0.0",
+    "author": "Daniel Rosehill / Carrot Cake AI",
+    "license": "MIT"
+  },
+  "layers": [
+    {
+      "id": "prompts",
+      "label": "Prompts",
+      "position": "center",
+      "order": 1,
+      "color": "#4a6fa5",
+      "description": "The instruction layer — where human intent enters the system.",
+      "nodes": [
+        {
+          "id": "user-prompt",
+          "label": "User Prompt",
+          "description": "The actual question or instruction from the end user — the starting point of every interaction."
+        },
+        {
+          "id": "system-prompt",
+          "label": "System Prompt",
+          "description": "Developer-defined instructions that shape the model's behavior, persona, and constraints."
+        },
+        {
+          "id": "vendor-prompt",
+          "label": "Vendor Prompt",
+          "description": "Hidden instructions baked into the model by the provider — RLHF alignment, safety guardrails, and system-level directives. The model is never truly vanilla, even via API."
+        }
+      ]
+    },
+    {
+      "id": "models",
+      "label": "Models",
+      "position": "center",
+      "order": 2,
+      "color": "#8b5cf6",
+      "description": "The large language models (or other foundation models) that power reasoning and generation.",
+      "nodes": [
+        {
+          "id": "commercial-models",
+          "label": "Commercial",
+          "description": "Proprietary frontier models — Claude, GPT, Gemini, Cohere."
+        },
+        {
+          "id": "open-source-models",
+          "label": "Open Source",
+          "description": "Open-weight models — Llama, Mistral, Qwen, DeepSeek, Phi."
+        },
+        {
+          "id": "fine-tuned-models",
+          "label": "Fine-Tuned",
+          "description": "Task-specific models fine-tuned on your data."
+        }
+      ]
+    },
+    {
+      "id": "inference",
+      "label": "Inference",
+      "position": "center",
+      "order": 3,
+      "color": "#6366f1",
+      "description": "Where and how models are served — the compute layer.",
+      "nodes": [
+        {
+          "id": "cloud-apis",
+          "label": "Cloud APIs",
+          "description": "Hosted API endpoints — Anthropic, OpenAI, Google, AWS Bedrock."
+        },
+        {
+          "id": "self-hosted",
+          "label": "Self-Hosted",
+          "description": "Running models on your own servers — vLLM, TGI, Ollama."
+        },
+        {
+          "id": "on-prem",
+          "label": "On-Prem",
+          "description": "Models in your data center — air-gapped, regulatory compliance."
+        },
+        {
+          "id": "edge",
+          "label": "Edge",
+          "description": "Lightweight models on devices — low latency, offline."
+        }
+      ]
+    },
+    {
+      "id": "agents",
+      "label": "Agents",
+      "position": "center",
+      "order": 4,
+      "color": "#e85d26",
+      "description": "The orchestration and execution layer — where AI systems reason, plan, and act.",
+      "tags": ["backend"],
+      "nodes": [
+        {
+          "id": "orchestration",
+          "label": "Orchestration",
+          "description": "Coordination layer — routing tasks, handling failures, managing state."
+        },
+        {
+          "id": "agents-node",
+          "label": "Agents",
+          "description": "Autonomous AI systems that reason, plan, and act."
+        },
+        {
+          "id": "pipelines",
+          "label": "Pipelines",
+          "description": "Multi-step data processing chains."
+        },
+        {
+          "id": "workflows",
+          "label": "Workflows",
+          "description": "Automated sequences triggered by events."
+        }
+      ]
+    },
+    {
+      "id": "mcp",
+      "label": "MCP",
+      "position": "center",
+      "order": 5,
+      "color": "#f5a623",
+      "description": "The Model Context Protocol — the open standard for connecting AI models to external tools, services, and data sources.",
+      "nodes": [
+        {
+          "id": "mcp-protocol",
+          "label": "Model Context Protocol",
+          "description": "The open standard for connecting AI models to external tools, services, and data sources."
+        }
+      ]
+    },
+    {
+      "id": "hitl",
+      "label": "Human-in-the-Loop",
+      "position": "center",
+      "order": 6,
+      "color": "#b91c1c",
+      "description": "Approval checkpoints where humans review and authorize agent actions before execution — the brakes on the system.",
+      "style": "checkpoint",
+      "nodes": [
+        {
+          "id": "hitl-checkpoint",
+          "label": "Human-in-the-Loop",
+          "description": "Approval checkpoints where humans review and authorize agent actions before execution — the brakes on the system."
+        }
+      ]
+    },
+    {
+      "id": "integrations",
+      "label": "Integrations",
+      "position": "center",
+      "order": 7,
+      "color": "#2563eb",
+      "style": "dashed",
+      "description": "External systems that agents connect to — your data, third-party services, and APIs.",
+      "nodes": [
+        {
+          "id": "your-data",
+          "label": "Your Data",
+          "description": "Connections to your data — Salesforce, HubSpot, Google Drive, Notion — via authenticated MCP servers."
+        },
+        {
+          "id": "search-apis",
+          "label": "Search APIs",
+          "description": "Web search, news feeds, and real-time data — typically API-key-based MCP integrations."
+        },
+        {
+          "id": "external-services",
+          "label": "External Services",
+          "description": "Third-party services and public integrations — weather, time, public datasets."
+        }
+      ]
+    },
+    {
+      "id": "storage",
+      "label": "Storage",
+      "position": "center",
+      "order": 8,
+      "color": "#14b8a6",
+      "description": "Persistence layer — where conversations, outputs, and prompt templates are stored.",
+      "nodes": [
+        {
+          "id": "conversations",
+          "label": "Conversations",
+          "description": "Persisted conversation threads for auditing, replay, and continuity."
+        },
+        {
+          "id": "outputs",
+          "label": "Outputs",
+          "description": "Generated text, structured data, files, and artifacts."
+        },
+        {
+          "id": "stored-prompts",
+          "label": "Prompts",
+          "description": "Prompt templates, system instructions, and versioned prompt libraries."
+        },
+        {
+          "id": "postgres",
+          "label": "Postgres",
+          "description": "Production relational databases — structured data, transactions, audit trails."
+        },
+        {
+          "id": "data-lakes",
+          "label": "Data Lakes",
+          "description": "Large-scale storage for unstructured data — logs, documents, embeddings, raw outputs."
+        }
+      ]
+    },
+    {
+      "id": "context-store",
+      "label": "Context Store",
+      "position": "center",
+      "order": 9,
+      "color": "#2563eb",
+      "style": "dashed",
+      "description": "The knowledge layer — RAG pipelines and persistent memory that ground agents in your data.",
+      "nodes": [
+        {
+          "id": "context-rag",
+          "label": "Context (RAG)",
+          "description": "Retrieval-Augmented Generation — grounding AI in your documents and knowledge bases."
+        },
+        {
+          "id": "memory",
+          "label": "Memory",
+          "description": "Persistent memory — conversation history, user preferences, learned facts."
+        },
+        {
+          "id": "vector-store",
+          "label": "Vector Store",
+          "description": "Embedding-based indexes — semantic search over documents, database records, and agent outputs."
+        }
+      ]
+    },
+    {
+      "id": "frontends",
+      "label": "Frontends",
+      "position": "left",
+      "order": 2,
+      "color": "#4a6fa5",
+      "description": "The interfaces your users see and interact with — chat windows, bot integrations, and dashboards.",
+      "nodes": [
+        {
+          "id": "frontends-card",
+          "label": "Frontends",
+          "description": "The interfaces your users see and interact with — chat windows, bot integrations, and dashboards."
+        }
+      ],
+      "sub_items": ["Chatbots", "Slack", "Telegram", "Web UIs", "Dashboards"]
+    },
+    {
+      "id": "safety",
+      "label": "Safety",
+      "position": "right",
+      "order": 2,
+      "color": "#b91c1c",
+      "description": "Constraints and oversight mechanisms that keep agents operating within defined boundaries.",
+      "nodes": [
+        {
+          "id": "safety-card",
+          "label": "Safety",
+          "description": "Constraints and oversight mechanisms that keep agents operating within defined boundaries."
+        }
+      ],
+      "sub_items": ["Guardrails", "Security Harnesses"]
+    },
+    {
+      "id": "observability",
+      "label": "Observability",
+      "position": "right",
+      "order": 3,
+      "color": "#065f46",
+      "description": "Tracking decisions, measuring quality, logging actions, and monitoring system health.",
+      "nodes": [
+        {
+          "id": "observability-card",
+          "label": "Observability",
+          "description": "Tracking decisions, measuring quality, logging actions, and monitoring system health."
+        }
+      ],
+      "sub_items": ["Eval", "Logging", "Monitoring"]
+    },
+    {
+      "id": "destinations",
+      "label": "Destinations",
+      "position": "left",
+      "order": 8,
+      "color": "#7c3aed",
+      "description": "Where stored data ultimately flows — knowledge management, compliance archives, and prompt libraries.",
+      "nodes": [
+        {
+          "id": "prompt-library",
+          "label": "Prompt Library",
+          "description": "A managed, versioned collection of prompt templates — curated from stored prompts for reuse across systems."
+        },
+        {
+          "id": "wiki-km",
+          "label": "Wiki / KM",
+          "description": "Knowledge management systems — wikis, Notion, Confluence — populated with curated agent outputs for organizational knowledge."
+        },
+        {
+          "id": "data-warehouse",
+          "label": "Data Warehouse",
+          "description": "Structured analytical storage for data mining, compliance auditing, and long-term retention of agent activity."
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "input-flow",
+      "from": "frontends-card",
+      "to": "user-prompt",
+      "label": "INPUT",
+      "style": "dashed",
+      "color": "#4a6fa5",
+      "description": "User requests flow from the frontend interface into the prompt layer."
+    },
+    {
+      "id": "prompts-to-models",
+      "from": "prompts",
+      "to": "models",
+      "color": "#4a6fa5",
+      "description": "Assembled prompts (user + system + vendor) are sent to the model."
+    },
+    {
+      "id": "models-to-inference",
+      "from": "models",
+      "to": "inference",
+      "color": "#8b5cf6",
+      "description": "Selected model is served through the chosen inference path."
+    },
+    {
+      "id": "inference-to-agents",
+      "from": "inference",
+      "to": "agents",
+      "color": "#6366f1",
+      "description": "Inference results feed into the agentic orchestration layer."
+    },
+    {
+      "id": "agents-to-mcp",
+      "from": "agents",
+      "to": "mcp",
+      "color": "#e85d26",
+      "description": "Agents invoke tools and services through the MCP standard."
+    },
+    {
+      "id": "mcp-to-hitl",
+      "from": "mcp",
+      "to": "hitl",
+      "color": "#f5a623",
+      "label": "TAKING ACTIONS",
+      "style": "solid",
+      "no_arrow": true,
+      "description": "Actions requested via MCP pass through human approval before execution."
+    },
+    {
+      "id": "hitl-to-integrations",
+      "from": "hitl",
+      "to": "integrations",
+      "color": "#b91c1c",
+      "description": "Approved actions proceed to external integrations."
+    },
+    {
+      "id": "agents-to-storage",
+      "from": "agents",
+      "to": "storage",
+      "style": "dashed",
+      "color": "#14b8a6",
+      "description": "Agents persist conversations, outputs, and prompt data to storage."
+    },
+    {
+      "id": "storage-to-context",
+      "from": "storage",
+      "to": "context-store",
+      "style": "dashed",
+      "color": "#2563eb",
+      "label": "CONTEXT-MINING",
+      "description": "Stored data is processed and indexed into the context store for retrieval."
+    },
+    {
+      "id": "context-to-agents",
+      "from": "context-store",
+      "to": "agents",
+      "style": "dashed",
+      "color": "#2563eb",
+      "description": "Context and memory feed back into the agent layer — the virtuous knowledge cycle."
+    },
+    {
+      "id": "output-flow",
+      "from": "agents-node",
+      "to": "frontends-card",
+      "label": "OUTPUT",
+      "style": "dashed",
+      "color": "#e85d26",
+      "description": "Agent responses are delivered back to the user through the frontend."
+    },
+    {
+      "id": "safety-to-agents",
+      "from": "safety-card",
+      "to": "agents",
+      "color": "#b91c1c",
+      "description": "Safety guardrails constrain agent behavior and actions."
+    },
+    {
+      "id": "observability-to-agents",
+      "from": "observability-card",
+      "to": "agents",
+      "color": "#065f46",
+      "description": "Observability tools monitor and log agent execution."
+    },
+    {
+      "id": "stored-prompts-to-prompt-library",
+      "from": "stored-prompts",
+      "to": "prompt-library",
+      "style": "dashed",
+      "color": "#4a6fa5",
+      "description": "Stored prompt templates are curated into a managed prompt library for reuse and versioning."
+    },
+    {
+      "id": "outputs-to-wiki",
+      "from": "outputs",
+      "to": "wiki-km",
+      "style": "dashed",
+      "color": "#7c3aed",
+      "description": "Curated agent outputs are published to wikis and knowledge management systems for organizational use."
+    },
+    {
+      "id": "outputs-to-data-warehouse",
+      "from": "outputs",
+      "to": "data-warehouse",
+      "style": "dashed",
+      "color": "#7c3aed",
+      "description": "Agent outputs flow into a data warehouse for data mining, analytics, and compliance archival."
+    },
+    {
+      "id": "postgres-to-context-store",
+      "from": "postgres",
+      "to": "context-rag",
+      "style": "dashed",
+      "color": "#14b8a6",
+      "description": "Production database records are indexed into vector stores, feeding the RAG pipeline with structured context."
+    }
+  ]
+}

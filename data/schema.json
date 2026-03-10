@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agentic-ai-architecture-map-schema",
+  "title": "Agentic AI Architecture Map",
+  "description": "Schema for the data model describing the moving pieces of a production agentic AI system.",
+  "type": "object",
+  "required": ["meta", "layers", "connections"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "meta": {
+      "type": "object",
+      "required": ["title", "version"],
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "version": { "type": "string" },
+        "author": { "type": "string" },
+        "license": { "type": "string" }
+      }
+    },
+    "layers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "position", "order", "color", "nodes"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the layer."
+          },
+          "label": {
+            "type": "string",
+            "description": "Display name for the layer."
+          },
+          "position": {
+            "type": "string",
+            "enum": ["left", "center", "right"],
+            "description": "Column position in the layout."
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Vertical ordering within the column (1 = top)."
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9a-fA-F]{6}$",
+            "description": "Primary color for the layer (hex)."
+          },
+          "description": {
+            "type": "string",
+            "description": "What this layer represents in the architecture."
+          },
+          "style": {
+            "type": "string",
+            "enum": ["solid", "dashed", "checkpoint"],
+            "description": "Visual style for the layer border."
+          },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Metadata tags (e.g. 'backend')."
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "label"],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Unique node identifier, used in connections."
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Display label."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Tooltip / explanatory text."
+                }
+              }
+            }
+          },
+          "sub_items": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Small tag labels shown beneath the layer (e.g. specific technologies)."
+          }
+        }
+      }
+    },
+    "connections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "from", "to"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique connection identifier."
+          },
+          "from": {
+            "type": "string",
+            "description": "Source node or layer ID."
+          },
+          "to": {
+            "type": "string",
+            "description": "Target node or layer ID."
+          },
+          "label": {
+            "type": "string",
+            "description": "Text label displayed on the connection."
+          },
+          "style": {
+            "type": "string",
+            "enum": ["solid", "dashed"],
+            "description": "Line style."
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "no_arrow": {
+            "type": "boolean",
+            "description": "If true, no arrowhead is drawn."
+          },
+          "description": {
+            "type": "string",
+            "description": "What this connection represents."
+          }
+        }
+      }
+    }
+  }
+}
