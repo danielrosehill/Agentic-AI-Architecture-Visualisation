@@ -107,7 +107,7 @@
       "id": "agents",
       "label": "Agents",
       "position": "center",
-      "order": 4,
+      "order": 5,
       "color": "#e85d26",
       "description": "The orchestration and execution layer — where AI systems reason, plan, and act. Agent execution is iterative: the agent calls models and tools in a loop, not once.",
       "tags": ["backend"],
@@ -138,7 +138,7 @@
       "id": "mcp",
       "label": "MCP",
       "position": "center",
-      "order": 5,
+      "order": 6,
       "color": "#f5a623",
       "description": "The Model Context Protocol — the open standard for connecting AI models to external tools, services, and data sources. Encompasses tool invocation, resource access, and prompt template serving.",
       "nodes": [
@@ -158,7 +158,7 @@
       "id": "hitl",
       "label": "Human-in-the-Loop",
       "position": "center",
-      "order": 6,
+      "order": 7,
       "color": "#b91c1c",
       "description": "Approval checkpoints where humans review and authorize agent actions before execution — the brakes on the system. Pattern varies: per-action for agents, stage-gate for pipelines, exception-based for workflows.",
       "style": "checkpoint",
@@ -171,13 +171,13 @@
       ]
     },
     {
-      "id": "integrations",
-      "label": "Integrations",
+      "id": "actions",
+      "label": "Actions",
       "position": "center",
-      "order": 7,
+      "order": 8,
       "color": "#2563eb",
       "style": "dashed",
-      "description": "External systems that agents connect to — your data, third-party services, and APIs. Bidirectional: agents both read from and write to integrations.",
+      "description": "External systems that agents act on — your data, third-party services, APIs, and financial systems. Bidirectional: agents both read from and write to these systems.",
       "nodes": [
         {
           "id": "your-data",
@@ -193,6 +193,11 @@
           "id": "external-services",
           "label": "External Services",
           "description": "Third-party services and public integrations — weather, time, public datasets."
+        },
+        {
+          "id": "digital-wallets",
+          "label": "Digital Wallets",
+          "description": "Payment and financial actions — Stripe, crypto wallets, bank APIs. Agents can initiate transactions, check balances, and manage subscriptions."
         }
       ]
     },
@@ -200,7 +205,7 @@
       "id": "storage",
       "label": "Storage",
       "position": "center",
-      "order": 8,
+      "order": 9,
       "color": "#14b8a6",
       "description": "Persistence layer — where conversations, outputs, and prompt templates are stored.",
       "nodes": [
@@ -235,7 +240,7 @@
       "id": "context-store",
       "label": "Context Store",
       "position": "center",
-      "order": 9,
+      "order": 4,
       "color": "#2563eb",
       "style": "dashed",
       "description": "The knowledge layer — RAG pipelines and persistent memory that ground agents in your data.",
@@ -309,7 +314,7 @@
       "id": "destinations",
       "label": "Destinations",
       "position": "left",
-      "order": 8,
+      "order": 9,
       "color": "#7c3aed",
       "description": "Where stored data ultimately flows — knowledge management, compliance archives, and prompt libraries.",
       "nodes": [
@@ -450,15 +455,15 @@
       "description": "Actions requested via MCP pass through human approval before execution."
     },
     {
-      "id": "hitl-to-integrations",
+      "id": "hitl-to-actions",
       "from": "hitl",
-      "to": "integrations",
+      "to": "actions",
       "color": "#b91c1c",
       "description": "Approved actions proceed to external integrations."
     },
     {
-      "id": "integrations-data-retrieval",
-      "from": "integrations",
+      "id": "actions-data-retrieval",
+      "from": "actions",
       "to": "mcp-protocol",
       "style": "dashed",
       "color": "#2563eb",

@@ -1,12 +1,12 @@
 :root {
-  --bg: #0f1117;
-  --bg-card: #1a1b26;
-  --bg-card-hover: #1e2030;
-  --text: #e0e0e8;
-  --text-muted: #8b8fa3;
-  --border: #2a2d3e;
-  --primary: #6366f1;
-  --accent: #f5a623;
+  --bg: #f8f9fb;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0f2f5;
+  --text: #1a1a2e;
+  --text-muted: #5a5f72;
+  --border: #d8dce6;
+  --primary: #4f46e5;
+  --accent: #e85d26;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
@@ -25,6 +25,7 @@ nav {
   background: var(--bg-card);
   border-bottom: 1px solid var(--border);
   position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 nav .brand {
   font-size: 1.1rem; font-weight: 700; color: var(--text);
@@ -40,7 +41,7 @@ nav .links a:hover, nav .links a.active { color: var(--text); text-decoration: n
 
 /* Hero */
 .hero { text-align: center; padding: 2.5rem 2rem 1rem; }
-.hero h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; }
+.hero h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
 .hero h1 span { color: var(--accent); }
 .hero p { color: var(--text-muted); max-width: 600px; margin: 0.5rem auto 0; font-size: 0.95rem; }
 .hero .meta { margin-top: 0.75rem; font-size: 0.8rem; color: var(--text-muted); }
@@ -50,11 +51,13 @@ nav .links a:hover, nav .links a.active { color: var(--text); text-decoration: n
 .diagram-wrap {
   position: relative; margin: 1rem auto; max-width: 1200px;
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 .diagram-toolbar {
   position: absolute; top: 0.75rem; right: 0.75rem; z-index: 20;
   display: flex; gap: 0.25rem;
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.25rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 .diagram-toolbar button {
   width: 32px; height: 32px; border: 1px solid var(--border); border-radius: 6px;
@@ -63,6 +66,7 @@ nav .links a:hover, nav .links a.active { color: var(--text); text-decoration: n
   transition: all 0.15s; font-family: monospace;
 }
 .diagram-toolbar button:hover { background: var(--bg-card-hover); color: var(--text); border-color: var(--primary); }
+.diagram-toolbar button.fullscreen-btn { width: auto; padding: 0 0.6rem; font-family: system-ui; font-size: 0.75rem; font-weight: 600; gap: 0.3rem; }
 .diagram-container { width: 100%; min-height: 900px; }
 .diagram-container svg { width: 100%; height: 100%; display: block; cursor: grab; }
 .diagram-container svg:active { cursor: grabbing; }
@@ -72,7 +76,7 @@ nav .links a:hover, nav .links a.active { color: var(--text); text-decoration: n
   position: fixed; background: #1a1a2e; color: #fff;
   padding: 0.6rem 0.85rem; border-radius: 8px; font-size: 0.78rem; line-height: 1.45;
   width: 240px; text-align: center; z-index: 200; pointer-events: none;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.15s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.15s;
 }
 
 /* Export bar */
@@ -81,6 +85,7 @@ nav .links a:hover, nav .links a.active { color: var(--text); text-decoration: n
   padding: 0.5rem 1.25rem; border: 1px solid var(--border); border-radius: 8px;
   background: var(--bg-card); color: var(--text); font-size: 0.82rem; font-weight: 600;
   cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 0.4rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 .export-bar button:hover, .export-bar a.btn:hover { background: var(--primary); border-color: var(--primary); color: #fff; text-decoration: none; }
 
@@ -97,33 +102,33 @@ nav .links a:hover, nav .links a.active { color: var(--text); text-decoration: n
 .page-section p { color: var(--text-muted); margin-bottom: 0.75rem; }
 .page-section ul { margin-left: 1.25rem; margin-bottom: 1rem; color: var(--text-muted); }
 .page-section li { margin-bottom: 0.35rem; }
-.page-section code { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 0.1rem 0.4rem; font-size: 0.85em; color: var(--primary); }
-.page-section pre { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem; }
+.page-section code { background: #eef0f5; border: 1px solid var(--border); border-radius: 4px; padding: 0.1rem 0.4rem; font-size: 0.85em; color: var(--primary); }
+.page-section pre { background: #eef0f5; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem; }
 
 /* Connection cards */
 .conn-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 0.75rem; margin-top: 1rem; }
-.conn-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; transition: border-color 0.15s; }
+.conn-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; transition: border-color 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
 .conn-card:hover { border-color: var(--primary); }
 .conn-card .conn-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem; }
 .conn-card .conn-path { font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.35rem; }
 .conn-card .conn-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
 .conn-card .conn-tag { display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 4px; margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
-.tag-autonomous { background: rgba(232,93,38,0.15); color: #e85d26; }
-.tag-deterministic { background: rgba(99,102,241,0.15); color: #6366f1; }
-.tag-bidirectional { background: rgba(37,99,235,0.15); color: #2563eb; }
-.tag-transport { background: rgba(20,184,166,0.15); color: #14b8a6; }
+.tag-autonomous { background: rgba(232,93,38,0.1); color: #c94d1e; }
+.tag-deterministic { background: rgba(79,70,229,0.1); color: #4f46e5; }
+.tag-bidirectional { background: rgba(37,99,235,0.1); color: #1d4ed8; }
+.tag-transport { background: rgba(20,184,166,0.1); color: #0d9488; }
 
 /* Value route cards */
-.value-route { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem; }
+.value-route { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
 .value-route h4 { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; }
 .value-route p { font-size: 0.85rem; }
 
 /* Layer list */
 .layer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem; margin-top: 1rem; }
-.layer-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; border-top: 3px solid var(--primary); }
+.layer-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; border-top: 3px solid var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
 .layer-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; }
 .layer-card .layer-nodes { font-size: 0.78rem; color: var(--text-muted); }
-.layer-card .node-chip { display: inline-block; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); border-radius: 4px; padding: 0.1rem 0.4rem; margin: 0.15rem 0.15rem 0 0; font-size: 0.72rem; color: var(--primary); }
+.layer-card .node-chip { display: inline-block; background: rgba(79,70,229,0.08); border: 1px solid rgba(79,70,229,0.18); border-radius: 4px; padding: 0.1rem 0.4rem; margin: 0.15rem 0.15rem 0 0; font-size: 0.72rem; color: var(--primary); }
 
 /* Tab navigation */
 .tab-nav { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; }
@@ -138,7 +143,7 @@ footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border);
 footer a { color: var(--primary); }
 
 /* Fullscreen */
-.diagram-wrap:fullscreen { background: var(--bg); border-radius: 0; }
+.diagram-wrap:fullscreen { background: #fff; border-radius: 0; }
 .diagram-wrap:fullscreen .diagram-container { min-height: 100vh; }
 
 @media (max-width: 768px) {

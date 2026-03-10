@@ -23,7 +23,7 @@
 <div class="hero">
   <h1>The <span>Agentic</span> Symphony</h1>
   <p>An interactive map of all the moving pieces in a production agentic AI system.</p>
-  <div class="meta">v<strong id="version">2.0.0</strong> &middot; <strong id="node-count">37</strong> nodes &middot; <strong id="conn-count">36</strong> connections &middot; <strong>13</strong> layers</div>
+  <div class="meta">v<strong id="version">2.0.0</strong> &middot; <strong id="node-count">38</strong> nodes &middot; <strong id="conn-count">36</strong> connections &middot; <strong>13</strong> layers</div>
 </div>
 
 <!-- Stats -->
@@ -35,7 +35,7 @@
     <button data-action="zoom-in" title="Zoom in">+</button>
     <button data-action="zoom-out" title="Zoom out">&minus;</button>
     <button data-action="reset" title="Reset">1:1</button>
-    <button data-action="fullscreen" title="Fullscreen">&#x26F6;</button>
+    <button data-action="fullscreen" class="fullscreen-btn" title="Fullscreen">&#x26F6; Fullscreen</button>
   </div>
   <div class="diagram-container" id="diagram-container"></div>
 </div>
@@ -153,7 +153,7 @@
 // ═══════════════════════════════════════
 // ARCHITECTURE DATA (V2)
 // ═══════════════════════════════════════
-const ARCH = {"meta":{"title":"Agentic AI Architecture Map","version":"2.0.0"},"layers":[{"id":"prompts","label":"Prompts","position":"center","order":1,"color":"#4a6fa5","description":"The instruction layer \u2014 where human intent enters the system.","nodes":[{"id":"user-prompt","label":"User Prompt","description":"The actual question or instruction from the end user."},{"id":"system-prompt","label":"System Prompt","description":"Developer-defined instructions that shape the model\u2019s behavior, persona, and constraints. Also the injection point for RAG context."},{"id":"vendor-prompt","label":"Vendor Prompt","description":"Hidden instructions baked in by the provider \u2014 RLHF alignment, safety guardrails. The model is never truly vanilla."}]},{"id":"models","label":"Models","position":"center","order":2,"color":"#8b5cf6","description":"Foundation models that power reasoning and generation.","nodes":[{"id":"commercial-models","label":"Commercial","description":"Proprietary frontier models \u2014 Claude, GPT, Gemini, Cohere."},{"id":"open-source-models","label":"Open Source","description":"Open-weight models \u2014 Llama, Mistral, Qwen, DeepSeek, Phi."},{"id":"fine-tuned-models","label":"Fine-Tuned","description":"Task-specific models fine-tuned on your data."},{"id":"embedding-models","label":"Embedding","description":"Embedding models for vector representations \u2014 power the vector store and RAG, not agent reasoning."}]},{"id":"inference","label":"Inference","position":"center","order":3,"color":"#6366f1","description":"Where and how models are served \u2014 the compute layer.","nodes":[{"id":"model-gateway","label":"Gateway","description":"Model gateway/router \u2014 handles model selection, load balancing, failover, rate limiting, cost tracking. OpenRouter (hosted) or LiteLLM (self-hosted)."},{"id":"cloud-apis","label":"Cloud APIs","description":"Hosted API endpoints \u2014 Anthropic, OpenAI, Google, AWS Bedrock."},{"id":"self-hosted","label":"Self-Hosted","description":"Your own servers \u2014 vLLM, TGI, Ollama."},{"id":"on-prem","label":"On-Prem","description":"Air-gapped data center deployments."},{"id":"edge","label":"Edge","description":"Lightweight models on devices \u2014 low latency, offline."},{"id":"prompt-cache","label":"Cache","description":"Prompt/response caching \u2014 semantic dedup, cost reduction, latency improvement."}]},{"id":"agents","label":"Agents","position":"center","order":4,"color":"#e85d26","description":"Orchestration and execution \u2014 where AI systems reason, plan, and act.","nodes":[{"id":"orchestration","label":"Orchestration","description":"Routes tasks to agents, pipelines, or workflows. Handles failures and state."},{"id":"agents-node","label":"Agents","description":"Autonomous systems that reason, plan, act. Tool selection is intelligent and non-deterministic. Execution is a loop."},{"id":"pipelines","label":"Pipelines","description":"Multi-step chains. Tools wired at design time \u2014 no intelligent selection."},{"id":"workflows","label":"Workflows","description":"Event-triggered sequences. Tools pre-configured at each node."}]},{"id":"mcp","label":"MCP","position":"center","order":5,"color":"#f5a623","description":"Model Context Protocol \u2014 the open standard for connecting AI to tools and data.","nodes":[{"id":"mcp-protocol","label":"Model Context Protocol","description":"The open standard for connecting AI models to external tools, services, and data sources."},{"id":"tool-registry","label":"Tool Registry","description":"Discovery mechanism for available tools \u2014 in MCP this is tools/list."}]},{"id":"hitl","label":"Human-in-the-Loop","position":"center","order":6,"color":"#b91c1c","description":"Approval checkpoints \u2014 the brakes on the system.","style":"checkpoint","nodes":[{"id":"hitl-checkpoint","label":"Human-in-the-Loop","description":"Humans review and authorize agent actions before execution."}]},{"id":"integrations","label":"Integrations","position":"center","order":7,"color":"#2563eb","style":"dashed","description":"External systems \u2014 bidirectional: agents read and write.","nodes":[{"id":"your-data","label":"Your Data","description":"Salesforce, HubSpot, Google Drive, Notion \u2014 via MCP."},{"id":"search-apis","label":"Search APIs","description":"Web search, news feeds, real-time data."},{"id":"external-services","label":"External Services","description":"Weather, time, public datasets."}]},{"id":"storage","label":"Storage","position":"center","order":8,"color":"#14b8a6","description":"Persistence \u2014 conversations, outputs, prompts.","nodes":[{"id":"conversations","label":"Conversations","description":"Persisted threads for auditing, replay, and context mining."},{"id":"outputs","label":"Outputs","description":"Generated text, structured data, files, artifacts."},{"id":"stored-prompts","label":"Prompts","description":"Prompt templates and versioned prompt libraries."},{"id":"postgres","label":"Postgres","description":"Production relational databases."},{"id":"data-lakes","label":"Data Lakes","description":"Large-scale unstructured storage \u2014 logs, documents, embeddings."}]},{"id":"context-store","label":"Context Store","position":"center","order":9,"color":"#2563eb","style":"dashed","description":"Knowledge layer \u2014 RAG and persistent memory.","nodes":[{"id":"context-rag","label":"Context (RAG)","description":"Retrieval-Augmented Generation \u2014 grounding AI in your documents."},{"id":"memory","label":"Memory","description":"Multiple forms: mined, ad-hoc, implicit, structured."},{"id":"vector-store","label":"Vector Store","description":"Embedding-based semantic search indexes."}]},{"id":"frontends","label":"Frontends","position":"left","order":2,"color":"#4a6fa5","description":"User-facing interfaces.","nodes":[{"id":"frontends-card","label":"Frontends","description":"Chat windows, bots, web UIs, dashboards."}],"sub_items":["Chatbots","Slack","Telegram","Web UIs","Dashboards"]},{"id":"safety","label":"Safety","position":"right","order":2,"color":"#b91c1c","description":"Constraints at multiple points: input, agent, tool-level.","nodes":[{"id":"safety-card","label":"Safety","description":"Guardrails and oversight mechanisms."}],"sub_items":["Guardrails","Security Harnesses","Input Filtering"]},{"id":"observability","label":"Observability","position":"right","order":3,"color":"#065f46","description":"Eval, logging, monitoring. Feeds back into prompt optimization.","nodes":[{"id":"observability-card","label":"Observability","description":"Tracking decisions, quality, actions, health."}],"sub_items":["Eval","Logging","Monitoring"]},{"id":"destinations","label":"Destinations","position":"left","order":8,"color":"#7c3aed","description":"Downstream consumers of stored outputs.","nodes":[{"id":"prompt-library","label":"Prompt Library","description":"Versioned, curated prompt templates for reuse."},{"id":"wiki-km","label":"Wiki / KM","description":"Organizational knowledge management."},{"id":"data-warehouse","label":"Data Warehouse","description":"Analytics, compliance, long-term retention."}]}],"connections":[{"id":"input-flow","from":"frontends-card","to":"user-prompt","label":"INPUT","style":"dashed","color":"#4a6fa5","description":"User requests flow from frontend to prompt layer."},{"id":"prompts-to-models","from":"prompts","to":"models","color":"#4a6fa5","description":"Assembled prompts (user + system + vendor + RAG context + tool defs) sent to model."},{"id":"models-to-inference","from":"models","to":"inference","color":"#8b5cf6","description":"Selected model served through chosen inference path."},{"id":"gateway-to-cloud-apis","from":"model-gateway","to":"cloud-apis","color":"#6366f1","description":"Gateway routes to cloud APIs based on model selection, cost, latency, or fallback rules."},{"id":"gateway-to-self-hosted","from":"model-gateway","to":"self-hosted","color":"#6366f1","description":"Gateway routes to self-hosted endpoints. LiteLLM unifies local and cloud access."},{"id":"inference-to-agents","from":"inference","to":"agents","color":"#6366f1","description":"Inference results feed into the agent orchestration layer."},{"id":"orchestration-to-agents","from":"orchestration","to":"agents-node","style":"dashed","color":"#e85d26","description":"Dispatches to agents for intelligent, flexible execution."},{"id":"orchestration-to-pipelines","from":"orchestration","to":"pipelines","style":"dashed","color":"#e85d26","description":"Dispatches to pipelines when steps are known and fixed."},{"id":"orchestration-to-workflows","from":"orchestration","to":"workflows","style":"dashed","color":"#e85d26","description":"Dispatches to workflows for event-triggered execution."},{"id":"agentic-loop","from":"agents-node","to":"inference","style":"dashed","color":"#e85d26","label":"AGENTIC LOOP","description":"Iterative execution: after each tool result, agent returns to model. May loop many times per request.","invocation_pattern":"autonomous"},{"id":"agents-autonomous-to-mcp","from":"agents-node","to":"mcp","color":"#e85d26","label":"AUTONOMOUS","description":"Agents autonomously invoke tools \u2014 intelligent, non-deterministic selection.","invocation_pattern":"autonomous"},{"id":"pipelines-deterministic-to-mcp","from":"pipelines","to":"mcp","color":"#e85d26","style":"solid","label":"DETERMINISTIC","description":"Tools wired at design time. Developer decides sequence.","invocation_pattern":"deterministic"},{"id":"workflows-deterministic-to-mcp","from":"workflows","to":"mcp","color":"#e85d26","style":"solid","label":"DETERMINISTIC","description":"Tools pre-configured per workflow node, event-triggered.","invocation_pattern":"deterministic"},{"id":"mcp-to-hitl","from":"mcp","to":"hitl","color":"#f5a623","label":"TAKING ACTIONS","style":"solid","no_arrow":true,"description":"Actions pass through human approval before execution."},{"id":"hitl-to-integrations","from":"hitl","to":"integrations","color":"#b91c1c","description":"Approved actions proceed to external integrations."},{"id":"integrations-data-retrieval","from":"integrations","to":"mcp-protocol","style":"dashed","color":"#2563eb","label":"DATA RETRIEVAL","description":"Data retrieved from external systems flows back through MCP. Integrations are bidirectional.","invocation_pattern":"bidirectional"},{"id":"agents-to-storage","from":"agents","to":"storage","style":"dashed","color":"#14b8a6","description":"Agents persist conversations, outputs, and prompt data."},{"id":"storage-to-context","from":"storage","to":"context-store","style":"dashed","color":"#2563eb","label":"CONTEXT-MINING","description":"Mined memory pattern \u2014 outputs post-processed into retrievable context.","invocation_pattern":"transport"},{"id":"context-to-agents","from":"context-store","to":"agents","style":"dashed","color":"#2563eb","description":"Context feeds back into agents \u2014 the virtuous knowledge cycle."},{"id":"agents-adhoc-memory","from":"agents-node","to":"memory","style":"dashed","color":"#2563eb","label":"AD-HOC MEMORY","description":"Agent directly writes/reads memory artifacts. Agent decides what to remember.","invocation_pattern":"bidirectional"},{"id":"output-flow","from":"agents-node","to":"frontends-card","label":"OUTPUT","style":"dashed","color":"#e85d26","description":"Agent responses delivered back to user through frontend."},{"id":"safety-to-agents","from":"safety-card","to":"agents","color":"#b91c1c","description":"Safety guardrails constrain agent behavior."},{"id":"safety-to-prompts","from":"safety-card","to":"prompts","color":"#b91c1c","style":"dashed","description":"Input guardrails \u2014 injection detection, content filtering."},{"id":"safety-to-mcp","from":"safety-card","to":"mcp-protocol","color":"#b91c1c","style":"dashed","description":"Tool-level safety \u2014 restricting tool access, parameter validation."},{"id":"observability-to-agents","from":"observability-card","to":"agents","color":"#065f46","description":"Monitoring and logging of agent execution."},{"id":"observability-to-storage","from":"observability-card","to":"data-lakes","style":"dashed","color":"#065f46","description":"Traces, logs, metrics persisted for analysis."},{"id":"observability-to-prompts","from":"observability-card","to":"stored-prompts","style":"dashed","color":"#065f46","label":"PROMPT OPTIMIZATION","description":"Eval results drive prompt iteration and versioning."},{"id":"frontends-to-observability","from":"frontends-card","to":"observability-card","style":"dashed","color":"#4a6fa5","description":"User feedback and telemetry flow to observability."},{"id":"context-rag-to-system-prompt","from":"context-rag","to":"system-prompt","style":"dashed","color":"#2563eb","label":"CONTEXT INJECTION","description":"RAG results injected into system prompt."},{"id":"embedding-models-to-vector-store","from":"embedding-models","to":"vector-store","style":"dashed","color":"#8b5cf6","description":"Embedding models generate vectors for semantic search."},{"id":"stored-prompts-to-prompt-library","from":"stored-prompts","to":"prompt-library","style":"dashed","color":"#4a6fa5","description":"Curated prompts become a versioned library."},{"id":"outputs-to-wiki","from":"outputs","to":"wiki-km","style":"dashed","color":"#7c3aed","description":"Agent outputs published to knowledge management."},{"id":"outputs-to-data-warehouse","from":"outputs","to":"data-warehouse","style":"dashed","color":"#7c3aed","description":"Outputs flow to data warehouse for analytics and compliance."},{"id":"postgres-to-context-store","from":"postgres","to":"context-rag","style":"dashed","color":"#14b8a6","description":"DB records indexed into RAG pipeline."},{"id":"user-prompt-to-conversations","from":"user-prompt","to":"conversations","style":"dashed","color":"#4a6fa5","description":"Prompts persisted as conversations for context mining."},{"id":"conversations-to-postgres","from":"conversations","to":"postgres","style":"dashed","color":"#14b8a6","label":"USER CONTEXT MINING","description":"Conversations mined for user context \u2014 preferences, patterns, domain knowledge."}]};
+const ARCH = {"meta":{"title":"Agentic AI Architecture Map","version":"2.0.0"},"layers":[{"id":"prompts","label":"Prompts","position":"center","order":1,"color":"#4a6fa5","description":"The instruction layer \u2014 where human intent enters the system.","nodes":[{"id":"user-prompt","label":"User Prompt","description":"The actual question or instruction from the end user."},{"id":"system-prompt","label":"System Prompt","description":"Developer-defined instructions that shape the model\u2019s behavior, persona, and constraints. Also the injection point for RAG context."},{"id":"vendor-prompt","label":"Vendor Prompt","description":"Hidden instructions baked in by the provider \u2014 RLHF alignment, safety guardrails. The model is never truly vanilla."}]},{"id":"models","label":"Models","position":"center","order":2,"color":"#8b5cf6","description":"Foundation models that power reasoning and generation.","nodes":[{"id":"commercial-models","label":"Commercial","description":"Proprietary frontier models \u2014 Claude, GPT, Gemini, Cohere."},{"id":"open-source-models","label":"Open Source","description":"Open-weight models \u2014 Llama, Mistral, Qwen, DeepSeek, Phi."},{"id":"fine-tuned-models","label":"Fine-Tuned","description":"Task-specific models fine-tuned on your data."},{"id":"embedding-models","label":"Embedding","description":"Embedding models for vector representations \u2014 power the vector store and RAG, not agent reasoning."}]},{"id":"inference","label":"Inference","position":"center","order":3,"color":"#6366f1","description":"Where and how models are served \u2014 the compute layer.","nodes":[{"id":"model-gateway","label":"Gateway","description":"Model gateway/router \u2014 handles model selection, load balancing, failover, rate limiting, cost tracking. OpenRouter (hosted) or LiteLLM (self-hosted)."},{"id":"cloud-apis","label":"Cloud APIs","description":"Hosted API endpoints \u2014 Anthropic, OpenAI, Google, AWS Bedrock."},{"id":"self-hosted","label":"Self-Hosted","description":"Your own servers \u2014 vLLM, TGI, Ollama."},{"id":"on-prem","label":"On-Prem","description":"Air-gapped data center deployments."},{"id":"edge","label":"Edge","description":"Lightweight models on devices \u2014 low latency, offline."},{"id":"prompt-cache","label":"Cache","description":"Prompt/response caching \u2014 semantic dedup, cost reduction, latency improvement."}]},{"id":"context-store","label":"Context Store","position":"center","order":4,"color":"#2563eb","style":"dashed","description":"Knowledge layer \u2014 RAG and persistent memory.","nodes":[{"id":"context-rag","label":"Context (RAG)","description":"Retrieval-Augmented Generation \u2014 grounding AI in your documents."},{"id":"memory","label":"Memory","description":"Multiple forms: mined, ad-hoc, implicit, structured."},{"id":"vector-store","label":"Vector Store","description":"Embedding-based semantic search indexes."}]},{"id":"agents","label":"Agents","position":"center","order":5,"color":"#e85d26","description":"Orchestration and execution \u2014 where AI systems reason, plan, and act.","nodes":[{"id":"orchestration","label":"Orchestration","description":"Routes to agents, pipelines, or workflows. Handles failures and state."},{"id":"agents-node","label":"Agents","description":"Autonomous systems that reason, plan, act. Tool selection is intelligent and non-deterministic. Execution is a loop."},{"id":"pipelines","label":"Pipelines","description":"Multi-step chains. Tools wired at design time \u2014 no intelligent selection."},{"id":"workflows","label":"Workflows","description":"Event-triggered sequences. Tools pre-configured at each node."}]},{"id":"mcp","label":"MCP","position":"center","order":6,"color":"#f5a623","description":"Model Context Protocol \u2014 the open standard for connecting AI to tools and data.","nodes":[{"id":"mcp-protocol","label":"Model Context Protocol","description":"The open standard for connecting AI models to external tools, services, and data sources."},{"id":"tool-registry","label":"Tool Registry","description":"Discovery mechanism for available tools \u2014 in MCP this is tools/list."}]},{"id":"hitl","label":"Human-in-the-Loop","position":"center","order":7,"color":"#b91c1c","description":"Approval checkpoints \u2014 the brakes on the system.","style":"checkpoint","nodes":[{"id":"hitl-checkpoint","label":"Human-in-the-Loop","description":"Humans review and authorize agent actions before execution."}]},{"id":"actions","label":"Actions","position":"center","order":8,"color":"#2563eb","style":"dashed","description":"External systems agents act on \u2014 bidirectional: agents read and write.","nodes":[{"id":"your-data","label":"Your Data","description":"Salesforce, HubSpot, Google Drive, Notion \u2014 via MCP."},{"id":"search-apis","label":"Search APIs","description":"Web search, news feeds, real-time data."},{"id":"external-services","label":"External Services","description":"Weather, time, public datasets."},{"id":"digital-wallets","label":"Digital Wallets","description":"Payment and financial actions \u2014 Stripe, crypto wallets, bank APIs."}]},{"id":"storage","label":"Storage","position":"center","order":9,"color":"#14b8a6","description":"Persistence \u2014 conversations, outputs, prompts.","nodes":[{"id":"conversations","label":"Conversations","description":"Persisted threads for auditing, replay, and context mining."},{"id":"outputs","label":"Outputs","description":"Generated text, structured data, files, artifacts."},{"id":"stored-prompts","label":"Prompts","description":"Prompt templates and versioned prompt libraries."},{"id":"postgres","label":"Postgres","description":"Production relational databases."},{"id":"data-lakes","label":"Data Lakes","description":"Large-scale unstructured storage \u2014 logs, documents, embeddings."}]},{"id":"frontends","label":"Frontends","position":"left","order":2,"color":"#4a6fa5","description":"User-facing interfaces.","nodes":[{"id":"frontends-card","label":"Frontends","description":"Chat windows, bots, web UIs, dashboards."}],"sub_items":["Chatbots","Slack","Telegram","Web UIs","Dashboards"]},{"id":"safety","label":"Safety","position":"right","order":2,"color":"#b91c1c","description":"Constraints at multiple points: input, agent, tool-level.","nodes":[{"id":"safety-card","label":"Safety","description":"Guardrails and oversight mechanisms."}],"sub_items":["Guardrails","Security Harnesses","Input Filtering"]},{"id":"observability","label":"Observability","position":"right","order":3,"color":"#065f46","description":"Eval, logging, monitoring. Feeds back into prompt optimization.","nodes":[{"id":"observability-card","label":"Observability","description":"Tracking decisions, quality, actions, health."}],"sub_items":["Eval","Logging","Monitoring"]},{"id":"destinations","label":"Destinations","position":"left","order":9,"color":"#7c3aed","description":"Downstream consumers of stored outputs.","nodes":[{"id":"prompt-library","label":"Prompt Library","description":"Versioned, curated prompt templates for reuse."},{"id":"wiki-km","label":"Wiki / KM","description":"Organizational knowledge management."},{"id":"data-warehouse","label":"Data Warehouse","description":"Analytics, compliance, long-term retention."}]}],"connections":[{"id":"input-flow","from":"frontends-card","to":"user-prompt","label":"INPUT","style":"dashed","color":"#4a6fa5","description":"User requests flow from frontend to prompt layer."},{"id":"prompts-to-models","from":"prompts","to":"models","color":"#4a6fa5","description":"Assembled prompts (user + system + vendor + RAG context + tool defs) sent to model."},{"id":"models-to-inference","from":"models","to":"inference","color":"#8b5cf6","description":"Selected model served through chosen inference path."},{"id":"gateway-to-cloud-apis","from":"model-gateway","to":"cloud-apis","color":"#6366f1","description":"Gateway routes to cloud APIs based on model selection, cost, latency, or fallback rules."},{"id":"gateway-to-self-hosted","from":"model-gateway","to":"self-hosted","color":"#6366f1","description":"Gateway routes to self-hosted endpoints. LiteLLM unifies local and cloud access."},{"id":"inference-to-agents","from":"inference","to":"agents","color":"#6366f1","description":"Inference results feed into the agent orchestration layer."},{"id":"orchestration-to-agents","from":"orchestration","to":"agents-node","style":"dashed","color":"#e85d26","description":"Dispatches to agents for intelligent, flexible execution."},{"id":"orchestration-to-pipelines","from":"orchestration","to":"pipelines","style":"dashed","color":"#e85d26","description":"Dispatches to pipelines when steps are known and fixed."},{"id":"orchestration-to-workflows","from":"orchestration","to":"workflows","style":"dashed","color":"#e85d26","description":"Dispatches to workflows for event-triggered execution."},{"id":"agentic-loop","from":"agents-node","to":"inference","style":"dashed","color":"#e85d26","label":"AGENTIC LOOP","description":"Iterative execution: after each tool result, agent returns to model. May loop many times per request.","invocation_pattern":"autonomous"},{"id":"agents-autonomous-to-mcp","from":"agents-node","to":"mcp","color":"#e85d26","label":"AUTONOMOUS","description":"Agents autonomously invoke tools \u2014 intelligent, non-deterministic selection.","invocation_pattern":"autonomous"},{"id":"pipelines-deterministic-to-mcp","from":"pipelines","to":"mcp","color":"#e85d26","style":"solid","label":"DETERMINISTIC","description":"Tools wired at design time. Developer decides sequence.","invocation_pattern":"deterministic"},{"id":"workflows-deterministic-to-mcp","from":"workflows","to":"mcp","color":"#e85d26","style":"solid","label":"DETERMINISTIC","description":"Tools pre-configured per workflow node, event-triggered.","invocation_pattern":"deterministic"},{"id":"mcp-to-hitl","from":"mcp","to":"hitl","color":"#f5a623","label":"TAKING ACTIONS","style":"solid","no_arrow":true,"description":"Actions pass through human approval before execution."},{"id":"hitl-to-actions","from":"hitl","to":"actions","color":"#b91c1c","description":"Approved actions proceed to external systems."},{"id":"actions-data-retrieval","from":"actions","to":"mcp-protocol","style":"dashed","color":"#2563eb","label":"DATA RETRIEVAL","description":"Data retrieved from external systems flows back through MCP. Actions are bidirectional.","invocation_pattern":"bidirectional"},{"id":"agents-to-storage","from":"agents","to":"storage","style":"dashed","color":"#14b8a6","description":"Agents persist conversations, outputs, and prompt data."},{"id":"storage-to-context","from":"storage","to":"context-store","style":"dashed","color":"#2563eb","label":"CONTEXT-MINING","description":"Mined memory pattern \u2014 outputs post-processed into retrievable context.","invocation_pattern":"transport"},{"id":"context-to-agents","from":"context-store","to":"agents","style":"dashed","color":"#2563eb","description":"Context feeds back into agents \u2014 the virtuous knowledge cycle."},{"id":"agents-adhoc-memory","from":"agents-node","to":"memory","style":"dashed","color":"#2563eb","label":"AD-HOC MEMORY","description":"Agent directly writes/reads memory artifacts. Agent decides what to remember.","invocation_pattern":"bidirectional"},{"id":"output-flow","from":"agents-node","to":"frontends-card","label":"OUTPUT","style":"dashed","color":"#e85d26","description":"Agent responses delivered back to user through frontend."},{"id":"safety-to-agents","from":"safety-card","to":"agents","color":"#b91c1c","description":"Safety guardrails constrain agent behavior."},{"id":"safety-to-prompts","from":"safety-card","to":"prompts","color":"#b91c1c","style":"dashed","description":"Input guardrails \u2014 injection detection, content filtering."},{"id":"safety-to-mcp","from":"safety-card","to":"mcp-protocol","color":"#b91c1c","style":"dashed","description":"Tool-level safety \u2014 restricting tool access, parameter validation."},{"id":"observability-to-agents","from":"observability-card","to":"agents","color":"#065f46","description":"Monitoring and logging of agent execution."},{"id":"observability-to-storage","from":"observability-card","to":"data-lakes","style":"dashed","color":"#065f46","description":"Traces, logs, metrics persisted for analysis."},{"id":"observability-to-prompts","from":"observability-card","to":"stored-prompts","style":"dashed","color":"#065f46","label":"PROMPT OPTIMIZATION","description":"Eval results drive prompt iteration and versioning."},{"id":"frontends-to-observability","from":"frontends-card","to":"observability-card","style":"dashed","color":"#4a6fa5","description":"User feedback and telemetry flow to observability."},{"id":"context-rag-to-system-prompt","from":"context-rag","to":"system-prompt","style":"dashed","color":"#2563eb","label":"CONTEXT INJECTION","description":"RAG results injected into system prompt."},{"id":"embedding-models-to-vector-store","from":"embedding-models","to":"vector-store","style":"dashed","color":"#8b5cf6","description":"Embedding models generate vectors for semantic search."},{"id":"stored-prompts-to-prompt-library","from":"stored-prompts","to":"prompt-library","style":"dashed","color":"#4a6fa5","description":"Curated prompts become a versioned library."},{"id":"outputs-to-wiki","from":"outputs","to":"wiki-km","style":"dashed","color":"#7c3aed","description":"Agent outputs published to knowledge management."},{"id":"outputs-to-data-warehouse","from":"outputs","to":"data-warehouse","style":"dashed","color":"#7c3aed","description":"Outputs flow to data warehouse for analytics and compliance."},{"id":"postgres-to-context-store","from":"postgres","to":"context-rag","style":"dashed","color":"#14b8a6","description":"DB records indexed into RAG pipeline."},{"id":"user-prompt-to-conversations","from":"user-prompt","to":"conversations","style":"dashed","color":"#4a6fa5","description":"Prompts persisted as conversations for context mining."},{"id":"conversations-to-postgres","from":"conversations","to":"postgres","style":"dashed","color":"#14b8a6","label":"USER CONTEXT MINING","description":"Conversations mined for user context \u2014 preferences, patterns, domain knowledge."}]};
 
 // ═══════════════════════════════════════
 // HELPERS
@@ -263,8 +263,8 @@ document.querySelectorAll('nav .links a[href^="#"]').forEach(a => {
 // ═══════════════════════════════════════
 (function initDiagram() {
   const container = document.getElementById('diagram-container');
-  const W = 1000, H = 920;
-  const centerW = 400;
+  const W = 1000, H = 1020;
+  const centerW = 420;
   const centerX = (W - centerW) / 2;
   const centerCX = W / 2;
   const leftCX = 95;
@@ -318,9 +318,9 @@ document.querySelectorAll('nav .links a[href^="#"]').forEach(a => {
   }
 
   function darken(hex, amt) {
-    let r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-    r = Math.max(0, r - amt); g = Math.max(0, g - amt); b = Math.max(0, b - amt);
-    return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+    let r = parseInt(hex.slice(1,3),16), gg = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    r = Math.max(0, r - amt); gg = Math.max(0, gg - amt); b = Math.max(0, b - amt);
+    return '#' + [r,gg,b].map(v => v.toString(16).padStart(2,'0')).join('');
   }
 
   function chip(parent, x, y, label, color, tooltip) {
@@ -335,14 +335,17 @@ document.querySelectorAll('nav .links a[href^="#"]').forEach(a => {
     return { x, y, w: tw, h: ch, cx: x, cy: y + ch/2 };
   }
 
+  // Light theme: label background uses page bg color
+  const labelBg = '#f8f9fb';
+
   function layerBox(parent, x, y, w, h, color, label, dashed, rightLabel) {
-    const bg = color + '0f';
+    const bg = color + '0a';
     const rect = parent.append('rect').attr('x',x).attr('y',y).attr('width',w).attr('height',h).attr('rx',12).attr('fill',bg).attr('stroke',color).attr('stroke-width',2);
     if (dashed) rect.attr('stroke-dasharray','6 4');
-    parent.append('rect').attr('x',x+16).attr('y',y-8).attr('width',label.length*7.5+12).attr('height',16).attr('fill','#0f1117');
+    parent.append('rect').attr('x',x+16).attr('y',y-8).attr('width',label.length*7.5+12).attr('height',16).attr('fill',labelBg);
     parent.append('text').attr('x',x+22).attr('y',y+3).attr('fill',color).attr('font-family','system-ui').attr('font-size','10').attr('font-weight','600').attr('letter-spacing','0.1em').text(label.toUpperCase());
     if (rightLabel) {
-      parent.append('rect').attr('x',x+w-rightLabel.length*7-22).attr('y',y-8).attr('width',rightLabel.length*7+12).attr('height',16).attr('fill','#0f1117');
+      parent.append('rect').attr('x',x+w-rightLabel.length*7-22).attr('y',y-8).attr('width',rightLabel.length*7+12).attr('height',16).attr('fill',labelBg);
       parent.append('text').attr('x',x+w-16).attr('y',y+3).attr('text-anchor','end').attr('fill',color).attr('font-family','system-ui').attr('font-size','9').attr('font-weight','600').attr('letter-spacing','0.12em').text(rightLabel.toUpperCase());
     }
   }
@@ -388,8 +391,16 @@ document.querySelectorAll('nav .links a[href^="#"]').forEach(a => {
   const arrowsG = g.append('g');
   const nodesG = g.append('g');
 
-  // Y positions
-  const pY=20, pH=55, mY=95, mH=60, iY=175, iH=75, aY=275, aH=85, mcpY=392, mcpH=55, hitlY=479, hitlH=28, intY=537, intH=85, stY=655, stH=80, csY=775, csH=65;
+  // Y positions — restructured: Prompts → Models → Inference → Context Store → Agents → MCP → HITL → Actions → Storage
+  const pY=20, pH=55;
+  const mY=95, mH=60;
+  const iY=175, iH=75;
+  const csY=275, csH=65;
+  const aY=370, aH=85;
+  const mcpY=487, mcpH=55;
+  const hitlY=574, hitlH=28;
+  const actY=632, actH=95;
+  const stY=760, stH=80;
 
   // ── PROMPTS ──
   layerBox(nodesG, centerX, pY, centerW, pH, '#4a6fa5', 'Prompts');
@@ -419,7 +430,21 @@ document.querySelectorAll('nav .links a[href^="#"]').forEach(a => {
   // Cache
   chip(nodesG, centerCX-170, iY+48, 'Cache', '#818cf8', 'Prompt/response caching \u2014 cost and latency reduction.');
 
-  drawConn(arrowsG, centerCX, iY+iH, centerCX, aY, '#6366f1');
+  drawConn(arrowsG, centerCX, iY+iH, centerCX, csY, '#6366f1');
+
+  // ── CONTEXT STORE (now right after inference) ──
+  layerBox(nodesG, centerX, csY, centerW, csH, '#2563eb', 'Context Store', true);
+  chip(nodesG, centerCX-70, csY+25, 'Context (RAG)', '#2563eb', 'Grounding AI in your documents.');
+  chip(nodesG, centerCX+45, csY+25, 'Memory', '#2563eb', 'Mined, ad-hoc, implicit, structured.');
+  chip(nodesG, centerCX+140, csY+25, 'Vector Store', '#2563eb', 'Semantic search indexes.');
+
+  // Context RAG -> System Prompt (injection arrow curving up-left)
+  arrowsG.append('path')
+    .attr('d', `M${centerCX-70},${csY+25} C${centerCX-70},${csY-10} ${centerX-40},${pY+pH/2} ${centerX},${pY+pH/2}`)
+    .attr('fill','none').attr('stroke','#2563eb').attr('stroke-width',1.5).attr('stroke-dasharray','4 3').attr('opacity',0.35);
+  arrowsG.append('text').attr('x',centerX-20).attr('y',iY+10).attr('text-anchor','end').attr('fill','#2563eb').attr('font-family','system-ui').attr('font-size','8').attr('font-weight','700').text('CONTEXT INJECTION');
+
+  drawConn(arrowsG, centerCX, csY+csH, centerCX, aY, '#2563eb');
 
   // ── AGENTS ──
   layerBox(nodesG, centerX, aY, centerW, aH, '#e85d26', 'Agents', false, 'Backend');
@@ -431,17 +456,28 @@ document.querySelectorAll('nav .links a[href^="#"]').forEach(a => {
 
   // Agentic loop arrow (left side, curving up from agents back to inference)
   arrowsG.append('path')
-    .attr('d', `M${centerX-4},${aY+52+14} C${centerX-50},${aY+52+14} ${centerX-50},${iY+iH/2} ${centerX},${iY+iH/2}`)
+    .attr('d', `M${centerX-4},${aY+52+14} C${centerX-55},${aY+52+14} ${centerX-55},${iY+iH/2} ${centerX},${iY+iH/2}`)
     .attr('fill','none').attr('stroke','#e85d26').attr('stroke-width',1.5).attr('stroke-dasharray','4 3').attr('opacity',0.5);
   arrowsG.append('polygon')
     .attr('points',`${centerX},${iY+iH/2} ${centerX-7},${iY+iH/2+4} ${centerX-7},${iY+iH/2-4}`)
     .attr('fill','#e85d26').attr('opacity',0.5);
-  arrowsG.append('text').attr('x',centerX-55).attr('y',(aY+iY+iH)/2).attr('text-anchor','middle').attr('fill','#e85d26').attr('font-family','system-ui').attr('font-size','8').attr('font-weight','700').attr('transform',`rotate(-90,${centerX-55},${(aY+iY+iH)/2})`).text('AGENTIC LOOP');
+  arrowsG.append('text').attr('x',centerX-60).attr('y',(aY+iY+iH)/2).attr('text-anchor','middle').attr('fill','#e85d26').attr('font-family','system-ui').attr('font-size','8').attr('font-weight','700').attr('transform',`rotate(-90,${centerX-60},${(aY+iY+iH)/2})`).text('AGENTIC LOOP');
+
+  // Context -> Agents feedback loop (right side, curving from context store down to agents)
+  arrowsG.append('path')
+    .attr('d', `M${centerX+centerW+4},${csY+csH/2} C${centerX+centerW+45},${csY+csH/2} ${centerX+centerW+45},${aY+aH/2} ${centerX+centerW},${aY+aH/2}`)
+    .attr('fill','none').attr('stroke','#2563eb').attr('stroke-width',1.5).attr('stroke-dasharray','4 3').attr('opacity',0.4);
+  arrowsG.append('polygon')
+    .attr('points',`${centerX+centerW},${aY+aH/2} ${centerX+centerW+7},${aY+aH/2-4} ${centerX+centerW+7},${aY+aH/2+4}`)
+    .attr('fill','#2563eb').attr('opacity',0.4);
+
+  // Ad-hoc memory arrow (agents -> memory)
+  drawConn(arrowsG, centerCX+85, aY+52+14, centerCX+45, csY+25+28, '#2563eb', {dashed:true, opacity:0.35, label:'AD-HOC MEMORY'});
 
   // ── MCP ──
   layerBox(nodesG, centerX, mcpY, centerW, mcpH, '#f5a623', 'MCP', false);
   chip(nodesG, centerCX-40, mcpY+18, 'Model Context Protocol', '#f5a623', 'Open standard for connecting AI to tools and data.');
-  chip(nodesG, centerCX+120, mcpY+18, 'Tool Registry', '#e09800', 'tools/list \u2014 discovery for available tools.');
+  chip(nodesG, centerCX+125, mcpY+18, 'Tool Registry', '#e09800', 'tools/list \u2014 discovery for available tools.');
 
   // ── HITL ──
   const hitlW = 180;
@@ -452,13 +488,14 @@ document.querySelectorAll('nav .links a[href^="#"]').forEach(a => {
 
   drawConn(arrowsG, centerCX, mcpY+mcpH, centerCX, hitlY, '#f5a623', {noArrow:true});
   arrowsG.append('text').attr('x',centerCX+80).attr('y',(mcpY+mcpH+hitlY)/2+2).attr('text-anchor','start').attr('fill','#f5a623').attr('font-family','system-ui').attr('font-size','9').attr('font-weight','700').text('TAKING ACTIONS');
-  drawConn(arrowsG, centerCX, hitlY+hitlH, centerCX, intY, '#b91c1c');
+  drawConn(arrowsG, centerCX, hitlY+hitlH, centerCX, actY, '#b91c1c');
 
-  // ── INTEGRATIONS ──
-  layerBox(nodesG, centerX, intY, centerW, intH, '#2563eb', 'Integrations', true);
-  chip(nodesG, centerCX-80, intY+22, 'Your Data', '#2563eb', 'Salesforce, HubSpot, Google Drive, Notion.');
-  chip(nodesG, centerCX+70, intY+22, 'Search APIs', '#2563eb', 'Web search, news, real-time data.');
-  chip(nodesG, centerCX, intY+54, 'External Services', '#2563eb', 'Weather, time, public datasets.');
+  // ── ACTIONS (was Integrations) ──
+  layerBox(nodesG, centerX, actY, centerW, actH, '#2563eb', 'Actions', true);
+  chip(nodesG, centerCX-95, actY+22, 'Your Data', '#2563eb', 'Salesforce, HubSpot, Google Drive, Notion.');
+  chip(nodesG, centerCX+55, actY+22, 'Search APIs', '#2563eb', 'Web search, news, real-time data.');
+  chip(nodesG, centerCX-65, actY+58, 'External Services', '#2563eb', 'Weather, time, public datasets.');
+  chip(nodesG, centerCX+75, actY+58, 'Digital Wallets', '#1d4ed8', 'Stripe, crypto, bank APIs.');
 
   // ── STORAGE ──
   drawConn(arrowsG, centerCX+100, aY+aH, centerCX+100, stY, '#14b8a6', {dashed:true, opacity:0.4});
@@ -469,20 +506,14 @@ document.querySelectorAll('nav .links a[href^="#"]').forEach(a => {
   chip(nodesG, centerCX-80, stY+50, 'Postgres', '#0d9488', 'Relational databases.');
   chip(nodesG, centerCX+70, stY+50, 'Data Lakes', '#0d9488', 'Logs, documents, embeddings.');
 
-  // ── CONTEXT STORE ──
-  drawConn(arrowsG, centerCX, stY+stH, centerCX, csY, '#2563eb', {dashed:true, label:'CONTEXT-MINING'});
-  layerBox(nodesG, centerX, csY, centerW, csH, '#2563eb', 'Context Store', true);
-  chip(nodesG, centerCX-70, csY+25, 'Context (RAG)', '#2563eb', 'Grounding AI in your documents.');
-  chip(nodesG, centerCX+45, csY+25, 'Memory', '#2563eb', 'Mined, ad-hoc, implicit, structured.');
-  chip(nodesG, centerCX+135, csY+25, 'Vector Store', '#2563eb', 'Semantic search indexes.');
-
-  // Context -> Agents feedback loop
+  // Storage -> Context Store feedback (curving left side, up)
   arrowsG.append('path')
-    .attr('d', `M${centerX-4},${csY+csH/2} C${centerX-60},${csY+csH/2} ${centerX-60},${aY+aH/2} ${centerX},${aY+aH/2}`)
+    .attr('d', `M${centerX-4},${stY+stH/2} C${centerX-65},${stY+stH/2} ${centerX-65},${csY+csH/2} ${centerX},${csY+csH/2}`)
     .attr('fill','none').attr('stroke','#2563eb').attr('stroke-width',1.5).attr('stroke-dasharray','4 3').attr('opacity',0.4);
   arrowsG.append('polygon')
-    .attr('points',`${centerX},${aY+aH/2} ${centerX-7},${aY+aH/2+4} ${centerX-7},${aY+aH/2-4}`)
+    .attr('points',`${centerX},${csY+csH/2} ${centerX-7},${csY+csH/2+4} ${centerX-7},${csY+csH/2-4}`)
     .attr('fill','#2563eb').attr('opacity',0.4);
+  arrowsG.append('text').attr('x',centerX-70).attr('y',(stY+csY+csH)/2).attr('text-anchor','middle').attr('fill','#2563eb').attr('font-family','system-ui').attr('font-size','8').attr('font-weight','700').attr('transform',`rotate(-90,${centerX-70},${(stY+csY+csH)/2})`).text('CONTEXT-MINING');
 
   // ── LEFT: FRONTENDS ──
   const fe = card(nodesG, leftCX, mY+20, 130, 65, '#4a6fa5', '\u{1F4BB}', 'Frontends', 'Chat windows, bots, web UIs, dashboards.');
@@ -512,7 +543,7 @@ document.querySelectorAll('nav .links a[href^="#"]').forEach(a => {
   subChips(nodesG, rightCX, obsC.y+obsC.h+8, ['Eval','Logging'], '#065f46');
   subChips(nodesG, rightCX, obsC.y+obsC.h+34, ['Monitoring'], '#065f46');
 
-  // Safety -> Agents, Safety -> Prompts, Safety -> MCP
+  // Safety -> Agents, Safety -> Prompts
   drawConn(arrowsG, rightCX-65, safetyC.cy, centerX+centerW, aY+30, '#b91c1c');
   drawConn(arrowsG, rightCX-65, safetyC.y+20, centerX+centerW, pY+pH/2, '#b91c1c', {dashed:true, opacity:0.35});
   // Obs -> Agents
@@ -529,12 +560,7 @@ document.querySelectorAll('nav .links a[href^="#"]').forEach(a => {
   drawConn(arrowsG, centerCX+25, stY+18+14, rightCX-60, stY+72+14, '#6366f1', {dashed:true, opacity:0.4});
 
   // Embedding -> Vector Store
-  drawConn(arrowsG, centerCX+160, mY+20+28, centerCX+135, csY+25, '#8b5cf6', {dashed:true, opacity:0.35});
-
-  // Context RAG -> System Prompt
-  arrowsG.append('path')
-    .attr('d', `M${centerCX-70},${csY+25} C${centerCX-70},${csY-10} ${centerX-40},${pY+pH/2} ${centerX},${pY+pH/2}`)
-    .attr('fill','none').attr('stroke','#2563eb').attr('stroke-width',1.5).attr('stroke-dasharray','4 3').attr('opacity',0.35);
+  drawConn(arrowsG, centerCX+160, mY+20+28, centerCX+140, csY+25, '#8b5cf6', {dashed:true, opacity:0.35});
 
 })();
 
@@ -550,7 +576,7 @@ function exportPNG(scale) {
   canvas.width = vb.width * scale;
   canvas.height = vb.height * scale;
   const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#0f1117';
+  ctx.fillStyle = '#f8f9fb';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   const img = new Image();
   img.onload = () => {
