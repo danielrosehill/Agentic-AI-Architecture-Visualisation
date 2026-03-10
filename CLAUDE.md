@@ -15,11 +15,12 @@ A framework-agnostic data model describing all the moving pieces of a production
 
 ## Visualization
 
-The interactive visualization lives in a separate HF Space repo:
-- **Local**: `~/repos/github/The-Agentic-Symphony/`
+The interactive visualization source lives in `site/` within this repo:
+- **Source**: `site/index.html`, `site/style.css`, `site/README.md`
+- **Deploy**: `./site/deploy.sh` pushes to the HF Space
 - **Live**: https://huggingface.co/spaces/danielrosehill/The-Agentic-Symphony
 
-When the data model changes, the HF Space `index.html` must be updated with the new embedded data.
+When the data model changes, update the embedded ARCH data in `site/index.html` and run the deploy script.
 
 ## Conventions
 
