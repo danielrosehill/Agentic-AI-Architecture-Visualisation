@@ -1,136 +1,97 @@
-# Agentic AI Architecture — The Moving Pieces
+# Agentic AI Architecture — The Moving Pieces (V2)
 
-This document describes each layer and connection in the architecture map. The canonical data lives in [`data/architecture.json`](../data/architecture.json); this document provides the narrative explanation.
+The canonical data lives in [`data/architecture.json`](../data/architecture.json). Interactive visualization at [The Agentic Symphony](https://huggingface.co/spaces/danielrosehill/The-Agentic-Symphony).
 
 ## Layout
 
-The diagram uses a three-column layout:
+Three-column layout:
 
 | Left | Center | Right |
 |------|--------|-------|
-| Frontends | Core pipeline (top → bottom) | Safety & Observability |
-
-The center column is the primary flow. The left and right columns represent cross-cutting concerns that connect horizontally into the center.
+| Frontends, Destinations | Core pipeline (top → bottom) | Safety, Observability |
 
 ---
 
-## Layers (top to bottom)
+## Layers
 
 ### 1. Prompts
-The instruction layer where human intent enters the system. Three distinct prompt types combine before reaching the model:
+Three prompt types combine before reaching the model. Prompt assembly is complex: template rendering, RAG context injection, tool definitions, conversation history, token budget allocation.
 
-- **User Prompt** — the end user's question or instruction
-- **System Prompt** — developer-defined behavioral instructions
-- **Vendor Prompt** — hidden provider-level directives (RLHF alignment, safety guardrails). The model is never truly "vanilla," even via raw API.
+- **User Prompt** — end user's instruction
+- **System Prompt** — developer-defined behavior + RAG context injection point
+- **Vendor Prompt** — hidden provider directives (RLHF, safety)
 
 ### 2. Models
-The foundation models that power reasoning and generation:
-
-- **Commercial** — proprietary frontier models (Claude, GPT, Gemini)
-- **Open Source** — open-weight models (Llama, Mistral, Qwen, DeepSeek)
-- **Fine-Tuned** — task-specific models trained on your data
+- **Commercial** — Claude, GPT, Gemini, Cohere
+- **Open Source** — Llama, Mistral, Qwen, DeepSeek, Phi
+- **Fine-Tuned** — task-specific on your data
+- **Embedding** *(V2)* — architecturally distinct from generative LLMs; powers vector store and RAG
 
 ### 3. Inference
-Where and how models are served:
-
-- **Cloud APIs** — hosted endpoints (Anthropic, OpenAI, Bedrock)
-- **Self-Hosted** — your own servers (vLLM, TGI, Ollama)
-- **On-Prem** — air-gapped data center deployments
-- **Edge** — lightweight models on devices
+- **Gateway** *(V2)* — model router (OpenRouter hosted, LiteLLM self-hosted). Routes to cloud or local endpoints based on model selection, cost, latency, fallback rules
+- **Cloud APIs** — Anthropic, OpenAI, Google, Bedrock
+- **Self-Hosted** — vLLM, TGI, Ollama
+- **On-Prem** — air-gapped
+- **Edge** — on-device, offline
+- **Cache** *(V2)* — prompt/response caching for cost and latency
 
 ### 4. Agents (Backend)
-The orchestration and execution layer:
+Different agent types have fundamentally different relationships with tools:
 
-- **Orchestration** — routing, failure handling, state management
-- **Agents** — autonomous systems that reason, plan, and act
-- **Pipelines** — multi-step data processing chains
-- **Workflows** — automated sequences triggered by events
+- **Orchestration** — dispatches to agents, pipelines, or workflows *(V2: now wired with connections)*
+- **Agents** — autonomous, non-deterministic tool invocation. **Execution is a loop** *(V2: agentic loop connection)*
+- **Pipelines** — deterministic, developer-wired tool steps
+- **Workflows** — event-triggered, pre-configured tools
+
+> **Key distinction**: Agents = autonomous. Pipelines/Workflows = deterministic. This is the line between "agentic" and "automated."
 
 ### 5. MCP (Model Context Protocol)
-The open standard for connecting AI models to external tools, services, and data sources. Acts as the universal adapter between agents and the outside world.
+- **Model Context Protocol** — the open standard
+- **Tool Registry** *(V2)* — discovery mechanism (tools/list). Tool descriptions are effectively prompts
 
 ### 6. Human-in-the-Loop
-Approval checkpoints where humans review and authorize agent actions before execution. This is the braking mechanism — especially critical for actions with real-world consequences.
+Pattern varies: per-action (agents), stage-gate (pipelines), exception-based (workflows).
 
 ### 7. Integrations
-External systems that agents connect to (typically via MCP):
-
-- **Your Data** — Salesforce, HubSpot, Google Drive, Notion
-- **Search APIs** — web search, news feeds, real-time data
-- **External Services** — weather, time, public datasets
+Bidirectional *(V2)*: agents both read from and write to external systems.
 
 ### 8. Storage
-The persistence layer:
-
-- **Conversations** — stored threads for auditing and replay
-- **Outputs** — generated text, files, and artifacts
-- **Prompts** — versioned prompt templates and libraries
-- **Postgres** — relational databases for structured data
-- **Data Lakes** — large-scale unstructured storage
+Conversations, Outputs, Prompts, Postgres, Data Lakes.
 
 ### 9. Context Store
-The knowledge layer that creates a feedback loop:
-
-- **Context (RAG)** — retrieval-augmented generation from your documents
-- **Memory** — persistent conversation history and learned facts
-- **Vector Store** — embedding-based indexes for semantic search over documents and database records
+- **Context (RAG)** — injected into system prompt *(V2: explicit CONTEXT INJECTION connection)*
+- **Memory** — mined, ad-hoc, implicit, structured
+- **Vector Store** — fed by embedding models *(V2: explicit connection)*
 
 ---
 
-## Destinations (Left Column)
+## V2 Changes
 
-These represent what you do with the data you save — the downstream consumers of stored outputs:
+### New Nodes (6)
+- `embedding-models` — distinct from generative LLMs
+- `model-gateway` — routing, load balancing, failover
+- `prompt-cache` — cost/latency reduction
+- `tool-registry` — tool discovery mechanism
 
-- **Prompt Library** — curated, versioned prompt templates drawn from stored prompts for reuse across systems
-- **Wiki / KM** — organizational knowledge management (Notion, Confluence, wikis) populated with curated agent outputs
-- **Data Warehouse** — structured analytical storage for data mining, compliance auditing, and long-term retention
+### New Connections (16)
+| Connection | Type | What it captures |
+|---|---|---|
+| `orchestration → agents/pipelines/workflows` | dashed | Orchestration now dispatches properly |
+| `agentic-loop` (agents → inference) | autonomous | Iterative agent execution |
+| `integrations → mcp-protocol` | bidirectional | Data retrieval (not just actions) |
+| `safety → prompts` | dashed | Input guardrails |
+| `safety → mcp-protocol` | dashed | Tool-level safety |
+| `observability → data-lakes` | dashed | Log/trace persistence |
+| `observability → stored-prompts` | dashed | Prompt optimization feedback |
+| `frontends → observability` | dashed | User feedback/telemetry |
+| `context-rag → system-prompt` | dashed | RAG context injection |
+| `embedding-models → vector-store` | dashed | Embedding → semantic search |
+| `gateway → cloud-apis` | solid | Gateway routing pattern |
+| `gateway → self-hosted` | solid | Gateway routing pattern |
+| `user-prompt → conversations` | dashed | Prompt capture for mining |
+| `conversations → postgres` | dashed | User context mining pipeline |
 
----
-
-## Side Columns
-
-### Frontends (Left)
-The user-facing interfaces: chatbots, Slack/Telegram bots, web UIs, and dashboards. Frontends send **input** to the prompt layer and receive **output** from the agent layer.
-
-### Safety (Right)
-Guardrails and security harnesses that constrain agent behavior.
-
-### Observability (Right)
-Evaluation, logging, and monitoring systems that track agent decisions and health.
-
----
-
-## Connections
-
-### Primary Flow (vertical, center)
-```
-Prompts → Models → Inference → Agents → MCP → HITL → Integrations
-```
-
-### Data Persistence (side path)
-```
-Agents ──(dashed)──→ Storage ──(context-mining)──→ Context Store ──(feedback)──→ Agents
-```
-This creates a virtuous cycle: agents persist data, which is mined for context, which feeds back into future agent runs.
-
-### Storage Destinations (downstream)
-```
-Stored Prompts ──→ Prompt Library
-Outputs ──→ Wiki / KM
-Outputs ──→ Data Warehouse  (data mining + compliance)
-Postgres ──→ Vector Store    (structured data → embeddings → RAG)
-```
-
-### Cross-cutting (horizontal)
-```
-Frontends ──(input)──→ Prompts
-Agents ──(output)──→ Frontends
-Safety ──→ Agents
-Observability ──→ Agents
-```
-
-### Key Labels
-- **INPUT** — user requests flowing from frontends to prompts
-- **OUTPUT** — agent responses flowing back to frontends
-- **TAKING ACTIONS** — the transition from MCP to human approval
-- **CONTEXT-MINING** — stored data being indexed into the context store
+### V1 → V2 Summary
+- Layers: 13 → 13 (same, but enriched)
+- Nodes: 33 → 37
+- Connections: 20 → 36

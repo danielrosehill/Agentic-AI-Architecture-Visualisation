@@ -3,7 +3,7 @@
   "meta": {
     "title": "Agentic AI Architecture Map",
     "description": "A map of all the moving pieces in a production agentic AI system",
-    "version": "2.0.0",
+    "version": "1.0.0",
     "author": "Daniel Rosehill / Carrot Cake AI",
     "license": "MIT"
   },
@@ -14,7 +14,7 @@
       "position": "center",
       "order": 1,
       "color": "#4a6fa5",
-      "description": "The instruction layer — where human intent enters the system. Prompt assembly is itself complex: template rendering, context injection from RAG, tool definition injection, conversation history management, and token budget allocation.",
+      "description": "The instruction layer — where human intent enters the system.",
       "nodes": [
         {
           "id": "user-prompt",
@@ -24,7 +24,7 @@
         {
           "id": "system-prompt",
           "label": "System Prompt",
-          "description": "Developer-defined instructions that shape the model's behavior, persona, and constraints. Also the injection point for RAG context and tool definitions."
+          "description": "Developer-defined instructions that shape the model's behavior, persona, and constraints."
         },
         {
           "id": "vendor-prompt",
@@ -39,7 +39,7 @@
       "position": "center",
       "order": 2,
       "color": "#8b5cf6",
-      "description": "The large language models (or other foundation models) that power reasoning and generation. Includes both generative LLMs and embedding models, which serve architecturally distinct roles.",
+      "description": "The large language models (or other foundation models) that power reasoning and generation.",
       "nodes": [
         {
           "id": "commercial-models",
@@ -55,11 +55,6 @@
           "id": "fine-tuned-models",
           "label": "Fine-Tuned",
           "description": "Task-specific models fine-tuned on your data."
-        },
-        {
-          "id": "embedding-models",
-          "label": "Embedding",
-          "description": "Embedding models that convert text to vector representations — architecturally distinct from generative LLMs. Power the vector store and RAG pipeline, not agent reasoning."
         }
       ]
     },
@@ -69,22 +64,17 @@
       "position": "center",
       "order": 3,
       "color": "#6366f1",
-      "description": "Where and how models are served — the compute layer. In production, requests often route through a model gateway before reaching the endpoint.",
+      "description": "Where and how models are served — the compute layer.",
       "nodes": [
-        {
-          "id": "model-gateway",
-          "label": "Gateway",
-          "description": "Model gateway / router — the front door for inference requests. Handles model selection, load balancing, failover, API key management, rate limiting, and cost tracking. OpenRouter (hosted) or LiteLLM (self-hosted). When present, all inference requests route through the gateway before reaching the model endpoint."
-        },
         {
           "id": "cloud-apis",
           "label": "Cloud APIs",
-          "description": "Hosted API endpoints — Anthropic, OpenAI, Google, AWS Bedrock. When a gateway is used, the gateway routes to these endpoints; without a gateway, agents call them directly."
+          "description": "Hosted API endpoints — Anthropic, OpenAI, Google, AWS Bedrock."
         },
         {
           "id": "self-hosted",
           "label": "Self-Hosted",
-          "description": "Running models on your own servers — vLLM, TGI, Ollama. A self-hosted LiteLLM gateway can sit in front of these for unified routing."
+          "description": "Running models on your own servers — vLLM, TGI, Ollama."
         },
         {
           "id": "on-prem",
@@ -95,11 +85,6 @@
           "id": "edge",
           "label": "Edge",
           "description": "Lightweight models on devices — low latency, offline."
-        },
-        {
-          "id": "prompt-cache",
-          "label": "Cache",
-          "description": "Prompt and response caching — semantic deduplication, response caching, and embedding caching. Reduces cost and latency. May be built into the gateway or a separate layer."
         }
       ]
     },
@@ -109,18 +94,18 @@
       "position": "center",
       "order": 4,
       "color": "#e85d26",
-      "description": "The orchestration and execution layer — where AI systems reason, plan, and act. Agent execution is iterative: the agent calls models and tools in a loop, not once.",
+      "description": "The orchestration and execution layer — where AI systems reason, plan, and act.",
       "tags": ["backend"],
       "nodes": [
         {
           "id": "orchestration",
           "label": "Orchestration",
-          "description": "Coordination layer — routing tasks to agents, pipelines, or workflows. Handles failures, manages state, and may intelligently select which sub-pattern to invoke."
+          "description": "Coordination layer — routing tasks, handling failures, managing state."
         },
         {
           "id": "agents-node",
           "label": "Agents",
-          "description": "Autonomous AI systems that reason, plan, and act. Agents autonomously decide which tools to invoke and when — tool selection is intelligent and non-deterministic. Execution is a loop: reason → act → observe → reason again."
+          "description": "Autonomous AI systems that reason, plan, and act. Agents autonomously decide which tools to invoke and when — tool selection is intelligent and non-deterministic."
         },
         {
           "id": "pipelines",
@@ -140,17 +125,12 @@
       "position": "center",
       "order": 5,
       "color": "#f5a623",
-      "description": "The Model Context Protocol — the open standard for connecting AI models to external tools, services, and data sources. Encompasses tool invocation, resource access, and prompt template serving.",
+      "description": "The Model Context Protocol — the open standard for connecting AI models to external tools, services, and data sources.",
       "nodes": [
         {
           "id": "mcp-protocol",
           "label": "Model Context Protocol",
           "description": "The open standard for connecting AI models to external tools, services, and data sources."
-        },
-        {
-          "id": "tool-registry",
-          "label": "Tool Registry",
-          "description": "Discovery mechanism for available tools — in MCP this is tools/list. Agents query the registry to learn what tools exist and what they do. Tool descriptions are effectively prompts; too many tools degrade model performance."
         }
       ]
     },
@@ -160,7 +140,7 @@
       "position": "center",
       "order": 6,
       "color": "#b91c1c",
-      "description": "Approval checkpoints where humans review and authorize agent actions before execution — the brakes on the system. Pattern varies: per-action for agents, stage-gate for pipelines, exception-based for workflows.",
+      "description": "Approval checkpoints where humans review and authorize agent actions before execution — the brakes on the system.",
       "style": "checkpoint",
       "nodes": [
         {
@@ -177,7 +157,7 @@
       "order": 7,
       "color": "#2563eb",
       "style": "dashed",
-      "description": "External systems that agents connect to — your data, third-party services, and APIs. Bidirectional: agents both read from and write to integrations.",
+      "description": "External systems that agents connect to — your data, third-party services, and APIs.",
       "nodes": [
         {
           "id": "your-data",
@@ -279,7 +259,7 @@
       "position": "right",
       "order": 2,
       "color": "#b91c1c",
-      "description": "Constraints and oversight mechanisms that keep agents operating within defined boundaries. Applied at multiple points: input filtering, agent constraints, tool-level restrictions, output filtering.",
+      "description": "Constraints and oversight mechanisms that keep agents operating within defined boundaries.",
       "nodes": [
         {
           "id": "safety-card",
@@ -287,7 +267,7 @@
           "description": "Constraints and oversight mechanisms that keep agents operating within defined boundaries."
         }
       ],
-      "sub_items": ["Guardrails", "Security Harnesses", "Input Filtering"]
+      "sub_items": ["Guardrails", "Security Harnesses"]
     },
     {
       "id": "observability",
@@ -295,7 +275,7 @@
       "position": "right",
       "order": 3,
       "color": "#065f46",
-      "description": "Tracking decisions, measuring quality, logging actions, and monitoring system health. Feeds back into prompt optimization.",
+      "description": "Tracking decisions, measuring quality, logging actions, and monitoring system health.",
       "nodes": [
         {
           "id": "observability-card",
@@ -346,7 +326,7 @@
       "from": "prompts",
       "to": "models",
       "color": "#4a6fa5",
-      "description": "Assembled prompts (user + system + vendor + injected RAG context + tool definitions) are sent to the model."
+      "description": "Assembled prompts (user + system + vendor) are sent to the model."
     },
     {
       "id": "models-to-inference",
@@ -356,59 +336,11 @@
       "description": "Selected model is served through the chosen inference path."
     },
     {
-      "id": "gateway-to-cloud-apis",
-      "from": "model-gateway",
-      "to": "cloud-apis",
-      "color": "#6366f1",
-      "description": "Gateway routes requests to cloud API endpoints based on model selection, cost, latency, or fallback rules. OpenRouter routes to Anthropic, OpenAI, Google etc. LiteLLM (self-hosted) provides the same routing with unified API."
-    },
-    {
-      "id": "gateway-to-self-hosted",
-      "from": "model-gateway",
-      "to": "self-hosted",
-      "color": "#6366f1",
-      "description": "Gateway routes to self-hosted model endpoints. A self-hosted LiteLLM instance can route to local vLLM/TGI/Ollama servers alongside cloud APIs, providing unified access."
-    },
-    {
       "id": "inference-to-agents",
       "from": "inference",
       "to": "agents",
       "color": "#6366f1",
       "description": "Inference results feed into the agentic orchestration layer."
-    },
-    {
-      "id": "orchestration-to-agents",
-      "from": "orchestration",
-      "to": "agents-node",
-      "style": "dashed",
-      "color": "#e85d26",
-      "description": "Orchestration dispatches tasks to autonomous agents when the task requires intelligent, flexible execution."
-    },
-    {
-      "id": "orchestration-to-pipelines",
-      "from": "orchestration",
-      "to": "pipelines",
-      "style": "dashed",
-      "color": "#e85d26",
-      "description": "Orchestration dispatches tasks to pipelines when the processing steps are known and fixed."
-    },
-    {
-      "id": "orchestration-to-workflows",
-      "from": "orchestration",
-      "to": "workflows",
-      "style": "dashed",
-      "color": "#e85d26",
-      "description": "Orchestration dispatches tasks to workflows when execution is event-triggered with predetermined steps."
-    },
-    {
-      "id": "agentic-loop",
-      "from": "agents-node",
-      "to": "inference",
-      "style": "dashed",
-      "color": "#e85d26",
-      "label": "AGENTIC LOOP",
-      "description": "Agent execution is iterative — after each tool result, the agent returns to the model for another reasoning step. This loop (reason → act → observe → reason) may execute many times per request. This is the defining characteristic of agentic systems.",
-      "invocation_pattern": "autonomous"
     },
     {
       "id": "agents-autonomous-to-mcp",
@@ -455,16 +387,6 @@
       "to": "integrations",
       "color": "#b91c1c",
       "description": "Approved actions proceed to external integrations."
-    },
-    {
-      "id": "integrations-data-retrieval",
-      "from": "integrations",
-      "to": "mcp-protocol",
-      "style": "dashed",
-      "color": "#2563eb",
-      "label": "DATA RETRIEVAL",
-      "description": "Data retrieved from external systems flows back through MCP to agents. Integrations are bidirectional — agents read from them (query CRM, fetch documents) as much as they write to them.",
-      "invocation_pattern": "bidirectional"
     },
     {
       "id": "agents-to-storage",
@@ -519,69 +441,11 @@
       "description": "Safety guardrails constrain agent behavior and actions."
     },
     {
-      "id": "safety-to-prompts",
-      "from": "safety-card",
-      "to": "prompts",
-      "color": "#b91c1c",
-      "style": "dashed",
-      "description": "Input guardrails — prompt injection detection, content filtering, and input sanitization before prompts reach the model."
-    },
-    {
-      "id": "safety-to-mcp",
-      "from": "safety-card",
-      "to": "mcp-protocol",
-      "color": "#b91c1c",
-      "style": "dashed",
-      "description": "Tool-level safety constraints — restricting which tools can be called, parameter validation, and preventing unauthorized actions."
-    },
-    {
       "id": "observability-to-agents",
       "from": "observability-card",
       "to": "agents",
       "color": "#065f46",
       "description": "Observability tools monitor and log agent execution."
-    },
-    {
-      "id": "observability-to-storage",
-      "from": "observability-card",
-      "to": "data-lakes",
-      "style": "dashed",
-      "color": "#065f46",
-      "description": "Traces, logs, eval results, and metrics are persisted to data lakes for analysis, debugging, and compliance."
-    },
-    {
-      "id": "observability-to-prompts",
-      "from": "observability-card",
-      "to": "stored-prompts",
-      "style": "dashed",
-      "color": "#065f46",
-      "label": "PROMPT OPTIMIZATION",
-      "description": "Evaluation results drive prompt optimization — a feedback loop where measured performance informs prompt iteration and versioning."
-    },
-    {
-      "id": "frontends-to-observability",
-      "from": "frontends-card",
-      "to": "observability-card",
-      "style": "dashed",
-      "color": "#4a6fa5",
-      "description": "Client-side telemetry, user feedback (thumbs up/down), and latency metrics flow from frontends to the observability layer."
-    },
-    {
-      "id": "context-rag-to-system-prompt",
-      "from": "context-rag",
-      "to": "system-prompt",
-      "style": "dashed",
-      "color": "#2563eb",
-      "label": "CONTEXT INJECTION",
-      "description": "RAG results are injected into the system prompt — this is literally how retrieval-augmented generation works. Retrieved context becomes part of the prompt assembly."
-    },
-    {
-      "id": "embedding-models-to-vector-store",
-      "from": "embedding-models",
-      "to": "vector-store",
-      "style": "dashed",
-      "color": "#8b5cf6",
-      "description": "Embedding models generate the vector representations stored in the vector store for semantic search and RAG retrieval."
     },
     {
       "id": "stored-prompts-to-prompt-library",
@@ -614,23 +478,6 @@
       "style": "dashed",
       "color": "#14b8a6",
       "description": "Production database records are indexed into vector stores, feeding the RAG pipeline with structured context."
-    },
-    {
-      "id": "user-prompt-to-conversations",
-      "from": "user-prompt",
-      "to": "conversations",
-      "style": "dashed",
-      "color": "#4a6fa5",
-      "description": "User prompts are persisted as conversations for auditing, replay, and context mining about the user."
-    },
-    {
-      "id": "conversations-to-postgres",
-      "from": "conversations",
-      "to": "postgres",
-      "style": "dashed",
-      "color": "#14b8a6",
-      "label": "USER CONTEXT MINING",
-      "description": "Conversations are structured and stored in production databases. A dedicated agentic workflow mines these for user context — preferences, patterns, domain knowledge — feeding the vector store for personalized future interactions."
     }
   ]
 }

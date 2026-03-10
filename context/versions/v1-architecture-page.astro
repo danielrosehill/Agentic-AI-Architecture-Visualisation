@@ -1,0 +1,375 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArchitectureDiagram from '../components/ArchitectureDiagram.astro';
+---
+
+<BaseLayout title="Architecture — The Moving Pieces" description="A visual map of the agentic AI stack — models, workers, data sources, frontends, safety, and observability. Everything that goes into building production AI systems.">
+
+  <section class="section">
+    <div class="container center">
+      <h1>The Moving Pieces</h1>
+      <p class="page-subtitle">The slide we wheel out to make it look like we know what we're doing</p>
+      <p class="page-intro">Every production AI system is made of the same building blocks. Here's how they fit together — and where I can help.</p>
+    </div>
+  </section>
+
+  <section class="section-alt arch-full-section">
+    <div class="container">
+      <ArchitectureDiagram />
+    </div>
+  </section>
+
+  <!-- The Cycle -->
+  <section class="section">
+    <div class="container">
+      <h2 class="center">It's a Cycle, Not a Pipeline</h2>
+      <p class="cycle-intro">At first glance, the diagram looks like a waterfall — prompts go in at the top, outputs come out through the agents. But the real power of agentic AI is that <strong>every layer feeds back into every other layer</strong>. Outputs get stored, stored data gets mined for context, context improves the next generation, better generations produce richer outputs. Prompts get analysed and refined into a library. Agent actions flow through integrations that enrich the data the agents will draw on next time. It's not a straight line — it's a flywheel. The more you use it, the smarter and more valuable it becomes.</p>
+    </div>
+  </section>
+
+  <!-- Detailed breakdown -->
+  <section class="section-alt">
+    <div class="container">
+      <h2 class="center">Layer by Layer</h2>
+      <div class="detail-grid">
+        <div class="detail-card detail-card--models">
+          <h3>Models</h3>
+          <p>The reasoning engines behind every agent. Commercial frontier models (Claude, GPT, Gemini) offer cutting-edge capability via API. Open-source models (Llama, Mistral, Qwen, DeepSeek) give you full control. Fine-tuned models are specialized on your data for domain-specific tasks.</p>
+          <div class="detail-chips">
+            <span class="detail-chip">Claude / GPT / Gemini</span>
+            <span class="detail-chip">Llama / Mistral / Qwen</span>
+            <span class="detail-chip">DeepSeek / Phi</span>
+            <span class="detail-chip">Fine-tuned models</span>
+          </div>
+        </div>
+
+        <div class="detail-card detail-card--inference">
+          <h3>Inference</h3>
+          <p>Where and how models run. Cloud APIs are the simplest path — zero infrastructure. Self-hosted gives you control over cost and latency. On-prem is required for air-gapped or regulated environments. Edge inference runs lightweight models directly on devices.</p>
+          <div class="detail-chips">
+            <span class="detail-chip">Cloud APIs (Anthropic, OpenAI)</span>
+            <span class="detail-chip">Self-hosted (vLLM, Ollama)</span>
+            <span class="detail-chip">On-prem / private cloud</span>
+            <span class="detail-chip">Edge / on-device</span>
+          </div>
+        </div>
+
+        <div class="detail-card detail-card--agents">
+          <h3>Agents</h3>
+          <p>The things that do things. An orchestration layer coordinates everything — routing tasks, handling failures, managing state. Underneath: agents reason and act autonomously, pipelines process data in defined steps, and workflows trigger on events.</p>
+          <div class="detail-chips">
+            <span class="detail-chip">Orchestration</span>
+            <span class="detail-chip">AI Agents</span>
+            <span class="detail-chip">Data pipelines</span>
+            <span class="detail-chip">Event workflows</span>
+          </div>
+        </div>
+
+        <div class="detail-card detail-card--mcp">
+          <h3>MCP</h3>
+          <p>Model Context Protocol — the open standard for connecting AI models to external tools and services. MCP servers bridge agents to your databases, APIs, and third-party integrations. Not typically used for RAG or memory, which are integrated directly.</p>
+          <div class="detail-chips">
+            <span class="detail-chip">External tool connections</span>
+            <span class="detail-chip">Service integrations</span>
+            <span class="detail-chip">Standard protocol</span>
+            <span class="detail-chip">Internal MCP servers</span>
+          </div>
+        </div>
+
+        <div class="detail-card detail-card--data">
+          <h3>Data Sources</h3>
+          <p>Where your agents get their information. Your internal data, external APIs, web search, persistent memory, and RAG over your knowledge base.</p>
+          <div class="detail-chips">
+            <span class="detail-chip">RAG / vector search</span>
+            <span class="detail-chip">Internal databases</span>
+            <span class="detail-chip">Web &amp; search APIs</span>
+            <span class="detail-chip">Agent memory</span>
+          </div>
+        </div>
+
+        <div class="detail-card detail-card--frontend">
+          <h3>Frontends</h3>
+          <p>Where users meet your agents. Chat interfaces, Slack and Telegram bots, web dashboards, and custom UIs tailored to your workflows.</p>
+          <div class="detail-chips">
+            <span class="detail-chip">Chatbots</span>
+            <span class="detail-chip">Slack / Teams bots</span>
+            <span class="detail-chip">Telegram bots</span>
+            <span class="detail-chip">Web dashboards</span>
+          </div>
+        </div>
+
+        <div class="detail-card detail-card--safety">
+          <h3>Safety</h3>
+          <p>Guardrails define what agents can and can't do. Security harnesses protect against prompt injection, data leakage, and unauthorized actions.</p>
+          <div class="detail-chips">
+            <span class="detail-chip">Input validation</span>
+            <span class="detail-chip">Output filtering</span>
+            <span class="detail-chip">Access controls</span>
+            <span class="detail-chip">Prompt hardening</span>
+          </div>
+        </div>
+
+        <div class="detail-card detail-card--obs">
+          <h3>Observability</h3>
+          <p>You can't improve what you can't measure. Eval frameworks test output quality, logging captures every decision, and monitoring alerts you when things go sideways.</p>
+          <div class="detail-chips">
+            <span class="detail-chip">Eval frameworks</span>
+            <span class="detail-chip">Decision logging</span>
+            <span class="detail-chip">Performance monitoring</span>
+            <span class="detail-chip">Cost tracking</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Latent Value -->
+  <section class="section-alt">
+    <div class="container">
+      <h2 class="center">Latent Value</h2>
+      <p class="latent-intro">Most teams build the forward path — prompt in, output out — and stop there. But the real compounding value lives in the feedback loops most people never wire up.</p>
+
+      <div class="latent-grid">
+        <div class="latent-card">
+          <div class="latent-icon">1</div>
+          <h3>Mine your existing data for context</h3>
+          <p>You already have years of business data sitting in production databases, CRMs, and document stores. Running extraction and embedding pipelines over this data builds a context store that makes every future generation smarter, more grounded, and more relevant to your specific business. Most teams start from zero when they could start from ten years of institutional knowledge.</p>
+          <div class="latent-flow">Existing Business Data &rarr; Embedding Pipeline &rarr; Context Store &rarr; Better Generations</div>
+        </div>
+
+        <div class="latent-card">
+          <div class="latent-icon">2</div>
+          <h3>Mine your stored prompts</h3>
+          <p>Every prompt your users send is a signal — what they're asking for, how they phrase it, where the model struggles, what patterns recur. Systematically analysing stored prompts reveals which system prompts work, which fail, and where the gaps are. This feeds directly into a prompt library that improves over time instead of staying static.</p>
+          <div class="latent-flow">Stored Prompts &rarr; Pattern Analysis &rarr; Prompt Library &rarr; Higher-Quality Instructions</div>
+        </div>
+
+        <div class="latent-card">
+          <div class="latent-icon">3</div>
+          <h3>Capture outputs to build a knowledge base</h3>
+          <p>Every output your agents generate — research reports, summaries, analyses, structured data — is potential institutional knowledge. Without a capture pipeline, this value evaporates after delivery. With one, every generation enriches a wiki or knowledge management system that compounds over time, reducing repeat work and building organisational memory.</p>
+          <div class="latent-flow">Agent Outputs &rarr; Review &amp; Curation &rarr; Wiki / KM &rarr; Organisational Memory</div>
+        </div>
+      </div>
+
+      <p class="latent-summary">These aren't advanced features — they're the difference between an AI system that stays flat and one that gets better every week. The diagram above shows where these loops connect. I help wire them up.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container cta-section">
+      <h2>Want help putting the pieces together?</h2>
+      <p>I build the full stack — from model selection through to production deployment.</p>
+      <div class="cta-buttons">
+        <a href="/contact" class="btn btn-primary">Start a Conversation</a>
+        <a href="/services" class="btn btn-outline">See Services</a>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .page-subtitle {
+    font-style: italic;
+    color: var(--color-text-light);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-intro {
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .center {
+    text-align: center;
+  }
+
+  .cycle-intro {
+    font-size: 1.05rem;
+    color: var(--color-text-secondary);
+    max-width: 720px;
+    margin: 0.5rem auto 0;
+    line-height: 1.7;
+    text-align: center;
+  }
+
+  .cycle-intro strong {
+    color: var(--color-text);
+  }
+
+  .arch-full-section {
+    padding: 3rem 0;
+  }
+
+  /* Detail Grid */
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .detail-card {
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 2px solid var(--color-border);
+    background: var(--color-bg);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .detail-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .detail-card h3 {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .detail-card--models { border-color: #8b5cf6; }
+  .detail-card--models h3 { color: #8b5cf6; }
+
+  .detail-card--inference { border-color: #6366f1; }
+  .detail-card--inference h3 { color: #6366f1; }
+
+  .detail-card--agents { border-color: var(--color-primary); }
+  .detail-card--agents h3 { color: var(--color-primary); }
+
+  .detail-card--mcp { border-color: #f5a623; }
+  .detail-card--mcp h3 { color: #d4920e; }
+
+  .detail-card--data { border-color: #2563eb; }
+  .detail-card--data h3 { color: #2563eb; }
+
+  .detail-card--frontend { border-color: #4a6fa5; }
+  .detail-card--frontend h3 { color: #4a6fa5; }
+
+  .detail-card--safety { border-color: #b91c1c; }
+  .detail-card--safety h3 { color: #b91c1c; }
+
+  .detail-card--obs { border-color: #065f46; }
+  .detail-card--obs h3 { color: #065f46; }
+
+  .detail-card p {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .detail-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .detail-chip {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    background: var(--color-bg-muted);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+  }
+
+  /* Latent Value */
+  .latent-intro {
+    text-align: center;
+    font-size: 1.05rem;
+    color: var(--color-text-secondary);
+    max-width: 680px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+  }
+
+  .latent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .latent-card {
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 2px solid var(--color-primary);
+    background: rgba(232, 93, 38, 0.03);
+  }
+
+  .latent-card h3 {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    color: var(--color-text);
+  }
+
+  .latent-card p {
+    font-size: 0.92rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .latent-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .latent-flow {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--color-primary);
+    padding: 0.5rem 0.75rem;
+    background: rgba(232, 93, 38, 0.06);
+    border-radius: 6px;
+    border: 1px solid rgba(232, 93, 38, 0.15);
+  }
+
+  .latent-summary {
+    text-align: center;
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* CTA */
+  .cta-section {
+    text-align: center;
+  }
+
+  .cta-section h2 {
+    margin-bottom: 0.75rem;
+  }
+
+  .cta-section p {
+    color: var(--color-text-secondary);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+</style>

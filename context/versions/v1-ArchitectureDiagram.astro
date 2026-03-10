@@ -1,0 +1,749 @@
+---
+interface Props {
+  compact?: boolean;
+}
+const { compact = false } = Astro.props;
+---
+
+<div class={`arch-d3-wrap ${compact ? 'arch-d3-wrap--compact' : ''}`} data-compact={compact}>
+  <div class="arch-toolbar">
+    <button class="arch-btn" data-action="zoom-in" title="Zoom in">+</button>
+    <button class="arch-btn" data-action="zoom-out" title="Zoom out">&minus;</button>
+    <button class="arch-btn" data-action="reset" title="Reset">1:1</button>
+    <button class="arch-btn arch-btn--fs" data-action="fullscreen" title="Fullscreen">&#x26F6;</button>
+  </div>
+  <div class="arch-d3-container"></div>
+</div>
+
+<style>
+  .arch-d3-wrap {
+    position: relative;
+    border: 2px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-bg);
+    overflow: hidden;
+    min-height: 860px;
+  }
+
+  .arch-d3-wrap--compact {
+    max-width: 1200px;
+    margin: 2.5rem auto;
+  }
+
+  .arch-toolbar {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 20;
+    display: flex;
+    gap: 0.25rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 0.25rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  .arch-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-bg);
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    font-family: var(--font-mono);
+    line-height: 1;
+  }
+
+  .arch-btn:hover {
+    background: var(--color-bg-muted);
+    color: var(--color-text);
+    border-color: var(--color-primary);
+  }
+
+  .arch-d3-container {
+    width: 100%;
+    height: 100%;
+    min-height: 860px;
+  }
+
+  .arch-d3-container :global(svg) {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: grab;
+  }
+
+  .arch-d3-container :global(svg:active) {
+    cursor: grabbing;
+  }
+
+  /* Tooltip */
+  :global(.arch-tooltip) {
+    position: fixed;
+    background: #1a1a2e;
+    color: #fff;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 400;
+    line-height: 1.4;
+    white-space: normal;
+    width: 220px;
+    text-align: center;
+    z-index: 100;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: opacity 0.15s;
+    opacity: 0;
+  }
+
+  /* Fullscreen */
+  .arch-d3-wrap:fullscreen {
+    background: var(--color-bg);
+  }
+
+  .arch-d3-wrap:fullscreen .arch-d3-container {
+    min-height: 100vh;
+  }
+</style>
+
+<script>
+  import * as d3 from 'd3';
+
+  function initD3Diagram() {
+    document.querySelectorAll('.arch-d3-wrap').forEach(wrapEl => {
+      const wrap = wrapEl as HTMLElement;
+      const container = wrap.querySelector('.arch-d3-container') as HTMLElement;
+      if (!container || container.querySelector('svg')) return;
+
+      // Layout constants
+      const W = 960, H = 860;
+      const COL_LEFT = 90, COL_CENTER = 380, COL_RIGHT = 800;
+      const centerW = 380;
+
+      // ── SVG setup with D3 zoom ──
+      const svg = d3.select(container)
+        .append('svg')
+        .attr('viewBox', `0 0 ${W} ${H}`)
+        .attr('preserveAspectRatio', 'xMidYMid meet');
+
+      const g = svg.append('g');
+
+      const zoom = d3.zoom<SVGSVGElement, unknown>()
+        .scaleExtent([0.4, 2.5])
+        .on('zoom', (event) => {
+          g.attr('transform', event.transform);
+        });
+
+      svg.call(zoom);
+
+      // Toolbar
+      wrap.querySelectorAll('.arch-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const action = (btn as HTMLElement).dataset.action;
+          const svgEl = container.querySelector('svg') as SVGSVGElement;
+          if (action === 'zoom-in') {
+            svg.transition().duration(200).call(zoom.scaleBy, 1.2);
+          } else if (action === 'zoom-out') {
+            svg.transition().duration(200).call(zoom.scaleBy, 0.8);
+          } else if (action === 'reset') {
+            svg.transition().duration(200).call(zoom.transform, d3.zoomIdentity);
+          } else if (action === 'fullscreen') {
+            if (document.fullscreenElement) {
+              document.exitFullscreen();
+            } else {
+              wrap.requestFullscreen();
+            }
+          }
+        });
+      });
+
+      // ── Tooltip ──
+      let tooltipEl: HTMLElement | null = null;
+      function showTooltip(evt: MouseEvent, text: string) {
+        if (!tooltipEl) {
+          tooltipEl = document.createElement('div');
+          tooltipEl.className = 'arch-tooltip';
+          document.body.appendChild(tooltipEl);
+        }
+        tooltipEl.textContent = text;
+        tooltipEl.style.opacity = '1';
+        const pad = 8;
+        const tipW = 220;
+        let left = evt.clientX - tipW / 2;
+        let top = evt.clientY - 60;
+        if (top < pad) top = evt.clientY + 20;
+        if (left < pad) left = pad;
+        if (left + tipW > window.innerWidth - pad) left = window.innerWidth - tipW - pad;
+        tooltipEl.style.left = left + 'px';
+        tooltipEl.style.top = top + 'px';
+      }
+      function hideTooltip() {
+        if (tooltipEl) tooltipEl.style.opacity = '0';
+      }
+
+      // ── Drawing helpers ──
+      function addGradientRect(
+        parent: d3.Selection<any, any, any, any>,
+        x: number, y: number, w: number, h: number,
+        colors: [string, string],
+        radius: number = 10
+      ) {
+        const id = `grad-${Math.random().toString(36).slice(2, 8)}`;
+        const defs = svg.select('defs').empty() ? svg.append('defs') : svg.select('defs');
+        const grad = defs.append('linearGradient')
+          .attr('id', id)
+          .attr('x1', '0%').attr('y1', '0%').attr('x2', '100%').attr('y2', '100%');
+        grad.append('stop').attr('offset', '0%').attr('stop-color', colors[0]);
+        grad.append('stop').attr('offset', '100%').attr('stop-color', colors[1]);
+        parent.append('rect')
+          .attr('x', x).attr('y', y).attr('width', w).attr('height', h)
+          .attr('rx', radius).attr('fill', `url(#${id})`);
+        return id;
+      }
+
+      function addChip(
+        parent: d3.Selection<any, any, any, any>,
+        x: number, y: number,
+        label: string, colors: [string, string],
+        tooltip: string, href?: string,
+        icon?: string
+      ) {
+        const chipG = parent.append('g')
+          .attr('class', 'arch-chip-g')
+          .style('cursor', href ? 'pointer' : 'default');
+
+        const text = icon ? `${icon} ${label}` : label;
+        const textW = text.length * 7.2 + 20;
+        const chipH = 28;
+        const chipX = x - textW / 2;
+
+        addGradientRect(chipG, chipX, y, textW, chipH, colors, 6);
+
+        chipG.append('text')
+          .attr('x', x).attr('y', y + chipH / 2 + 1)
+          .attr('text-anchor', 'middle')
+          .attr('dominant-baseline', 'middle')
+          .attr('fill', '#fff')
+          .attr('font-family', 'var(--font-mono), monospace')
+          .attr('font-size', '11')
+          .attr('font-weight', '600')
+          .text(text);
+
+        if (tooltip) {
+          chipG
+            .on('mousemove', (evt: MouseEvent) => showTooltip(evt, tooltip))
+            .on('mouseleave', hideTooltip);
+        }
+        if (href) {
+          chipG.on('click', () => window.location.href = href);
+        }
+
+        return { x, y, w: textW, h: chipH, cx: x, cy: y + chipH / 2 };
+      }
+
+      function addLayerBox(
+        parent: d3.Selection<any, any, any, any>,
+        x: number, y: number, w: number, h: number,
+        borderColor: string, bgAlpha: string,
+        label: string, labelColor?: string,
+        dashed: boolean = false,
+        rightLabel?: string
+      ) {
+        const rect = parent.append('rect')
+          .attr('x', x).attr('y', y).attr('width', w).attr('height', h)
+          .attr('rx', 12)
+          .attr('fill', bgAlpha)
+          .attr('stroke', borderColor)
+          .attr('stroke-width', 2);
+        if (dashed) rect.attr('stroke-dasharray', '6 4');
+
+        parent.append('rect')
+          .attr('x', x + 16).attr('y', y - 8)
+          .attr('width', label.length * 7.5 + 12).attr('height', 16)
+          .attr('fill', 'var(--color-bg, #fff)');
+        parent.append('text')
+          .attr('x', x + 22).attr('y', y + 3)
+          .attr('fill', labelColor || '#666')
+          .attr('font-family', 'var(--font-mono), monospace')
+          .attr('font-size', '10')
+          .attr('font-weight', '600')
+          .attr('letter-spacing', '0.1em')
+          .text(label.toUpperCase());
+
+        if (rightLabel) {
+          parent.append('rect')
+            .attr('x', x + w - rightLabel.length * 7 - 22).attr('y', y - 8)
+            .attr('width', rightLabel.length * 7 + 12).attr('height', 16)
+            .attr('fill', 'var(--color-bg, #fff)');
+          parent.append('text')
+            .attr('x', x + w - 16).attr('y', y + 3)
+            .attr('text-anchor', 'end')
+            .attr('fill', borderColor)
+            .attr('font-family', 'var(--font-mono), monospace')
+            .attr('font-size', '9')
+            .attr('font-weight', '600')
+            .attr('letter-spacing', '0.12em')
+            .text(rightLabel.toUpperCase());
+        }
+
+        return { x, y, w, h };
+      }
+
+      function addCard(
+        parent: d3.Selection<any, any, any, any>,
+        cx: number, y: number, w: number, h: number,
+        colors: [string, string],
+        icon: string, title: string,
+        tooltip: string, href: string
+      ) {
+        const cardG = parent.append('g').style('cursor', 'pointer');
+        const x = cx - w / 2;
+        addGradientRect(cardG, x, y, w, h, colors, 10);
+
+        cardG.append('text')
+          .attr('x', cx).attr('y', y + h / 2 - 6)
+          .attr('text-anchor', 'middle')
+          .attr('fill', '#fff')
+          .attr('font-size', '18')
+          .text(icon);
+        cardG.append('text')
+          .attr('x', cx).attr('y', y + h / 2 + 12)
+          .attr('text-anchor', 'middle')
+          .attr('fill', '#fff')
+          .attr('font-family', 'var(--font-mono), monospace')
+          .attr('font-size', '12')
+          .attr('font-weight', '700')
+          .text(title);
+
+        if (tooltip) {
+          cardG
+            .on('mousemove', (evt: MouseEvent) => showTooltip(evt, tooltip))
+            .on('mouseleave', hideTooltip);
+        }
+        cardG.on('click', () => window.location.href = href);
+
+        return { x, y, w, h, cx, cy: y + h / 2 };
+      }
+
+      function addSubChips(
+        parent: d3.Selection<any, any, any, any>,
+        cx: number, y: number,
+        items: string[],
+        bgColor: string, borderColor: string, textColor: string
+      ) {
+        const chipH = 20;
+        const gap = 4;
+        let totalW = items.reduce((s, t) => s + t.length * 6 + 16 + gap, -gap);
+        let startX = cx - totalW / 2;
+        items.forEach((item) => {
+          const chipW = item.length * 6 + 16;
+          parent.append('rect')
+            .attr('x', startX).attr('y', y)
+            .attr('width', chipW).attr('height', chipH)
+            .attr('rx', 5)
+            .attr('fill', bgColor)
+            .attr('stroke', borderColor)
+            .attr('stroke-width', 1.5);
+          parent.append('text')
+            .attr('x', startX + chipW / 2).attr('y', y + chipH / 2 + 1)
+            .attr('text-anchor', 'middle')
+            .attr('dominant-baseline', 'middle')
+            .attr('fill', textColor)
+            .attr('font-family', 'var(--font-mono), monospace')
+            .attr('font-size', '8.5')
+            .attr('font-weight', '600')
+            .text(item);
+          startX += chipW + gap;
+        });
+      }
+
+      // ── Arrow / connection drawing ──
+      function drawConnection(
+        arrowsG: d3.Selection<any, any, any, any>,
+        x1: number, y1: number, x2: number, y2: number,
+        color: string,
+        opts: { dashed?: boolean; label?: string; labelSide?: 'left' | 'right' | 'above'; curved?: 'horizontal' | 'vertical' | 'auto'; opacity?: number; noArrow?: boolean } = {}
+      ) {
+        const midX = (x1 + x2) / 2;
+        const midY = (y1 + y2) / 2;
+
+        let d: string;
+        const curveType = opts.curved || 'auto';
+
+        if (curveType === 'horizontal') {
+          d = `M${x1},${y1} C${midX},${y1} ${midX},${y2} ${x2},${y2}`;
+        } else if (curveType === 'vertical') {
+          d = `M${x1},${y1} C${x1},${midY} ${x2},${midY} ${x2},${y2}`;
+        } else {
+          if (Math.abs(y2 - y1) > Math.abs(x2 - x1)) {
+            d = `M${x1},${y1} C${x1},${midY} ${x2},${midY} ${x2},${y2}`;
+          } else {
+            d = `M${x1},${y1} C${midX},${y1} ${midX},${y2} ${x2},${y2}`;
+          }
+        }
+
+        arrowsG.append('path')
+          .attr('d', d)
+          .attr('fill', 'none')
+          .attr('stroke', color)
+          .attr('stroke-width', 2)
+          .attr('opacity', opts.opacity ?? 0.7)
+          .attr('stroke-dasharray', opts.dashed ? '6 4' : 'none');
+
+        if (!opts.noArrow) {
+          const angle = Math.atan2(y2 - midY, x2 - midX);
+          const hl = 7;
+          const ax = x2 - hl * Math.cos(angle - 0.4);
+          const ay = y2 - hl * Math.sin(angle - 0.4);
+          const bx = x2 - hl * Math.cos(angle + 0.4);
+          const by = y2 - hl * Math.sin(angle + 0.4);
+          arrowsG.append('polygon')
+            .attr('points', `${x2},${y2} ${ax},${ay} ${bx},${by}`)
+            .attr('fill', color)
+            .attr('opacity', opts.opacity ?? 0.7);
+        }
+
+        if (opts.label) {
+          const lx = opts.labelSide === 'left' ? midX - 20 : opts.labelSide === 'right' ? midX + 20 : midX;
+          const ly = opts.labelSide === 'above' ? midY - 8 : midY - 4;
+          arrowsG.append('text')
+            .attr('x', lx).attr('y', ly)
+            .attr('text-anchor', 'middle')
+            .attr('fill', color)
+            .attr('font-family', 'var(--font-mono), monospace')
+            .attr('font-size', '9')
+            .attr('font-weight', '700')
+            .text(opts.label);
+        }
+      }
+
+      // ══════════════════════════════════
+      // ── DRAW THE DIAGRAM ──
+      // ══════════════════════════════════
+
+      const arrowsG = g.append('g').attr('class', 'arrows');
+      const nodesG = g.append('g').attr('class', 'nodes');
+
+      // ── Positions ──
+      const leftCX = COL_LEFT;
+      const centerX = (W - centerW) / 2;
+      const centerCX = W / 2;
+      const rightCX = COL_RIGHT;
+
+      // Y positions for center column layers
+      const promptLayerY = 20;
+      const promptLayerH = 55;
+      const modelsY = 95;
+      const modelsH = 60;
+      const inferenceY = 175;
+      const inferenceH = 60;
+      const agentsY = 255;
+      const agentsH = 85;
+      const mcpLayerY = 372;
+      const mcpLayerH = 50;
+      const hitlY = 454;
+      const hitlH = 28;
+      const integrationsY = 512;
+      const integrationsH = 85;
+      const storageY = 630;
+      const storageH = 80;
+      const knowledgeY = 750;
+      const knowledgeH = 65;
+
+      // ── PROMPT LAYER at very top ──
+      const promptLayerG = nodesG.append('g').style('cursor', 'default');
+      addLayerBox(promptLayerG, centerX, promptLayerY, centerW, promptLayerH, '#4a6fa5', 'rgba(74,111,165,0.06)', 'Prompts', '#4a6fa5');
+      // Invisible hover target over the whole layer box
+      promptLayerG.append('rect')
+        .attr('x', centerX).attr('y', promptLayerY).attr('width', centerW).attr('height', promptLayerH)
+        .attr('fill', 'transparent');
+      promptLayerG
+        .on('mousemove', (evt: MouseEvent) => showTooltip(evt, 'The Prompt Stack — like an iceberg. The user prompt is the visible tip, but for best results you need a system prompt shaping behaviour underneath, and beneath that sit the vendor\'s own guardrails and hidden instructions baked into the model.'))
+        .on('mouseleave', hideTooltip);
+      addChip(nodesG, centerCX - 100, promptLayerY + 20, 'User Prompt', ['#4a6fa5', '#3d5f8a'],
+        'The actual question or instruction from the end user — the starting point of every interaction');
+      addChip(nodesG, centerCX + 5, promptLayerY + 20, 'System Prompt', ['#4a6fa5', '#3d5f8a'],
+        'Developer-defined instructions that shape the model\'s behavior, persona, and constraints');
+      addChip(nodesG, centerCX + 120, promptLayerY + 20, 'Vendor Prompt', ['#6b8ab8', '#4a6fa5'],
+        'Hidden instructions baked into the model by the provider — RLHF alignment, safety guardrails, and system-level directives. The model is never truly vanilla, even via API.');
+
+      // Arrow from prompt layer down to models
+      drawConnection(arrowsG, centerCX, promptLayerY + promptLayerH, centerCX, modelsY, '#4a6fa5');
+
+      // ── LEFT COLUMN: Frontends ──
+      const feCard = addCard(nodesG, leftCX, modelsY + 20, 130, 65,
+        ['#4a6fa5', '#5b7fb5'], '\u{1F4BB}', 'Frontends',
+        'The interfaces users interact with — chatbots can leverage either autonomous agent-style MCP execution or defined pipeline/workflow patterns depending on the use case',
+        '/why-agents/agentic-front-end'
+      );
+      addSubChips(nodesG, leftCX, feCard.y + feCard.h + 8,
+        ['Chatbots', 'Slack'], 'rgba(74,111,165,0.08)', 'rgba(74,111,165,0.3)', '#4a6fa5');
+      addSubChips(nodesG, leftCX, feCard.y + feCard.h + 34,
+        ['Telegram', 'Web UIs'], 'rgba(74,111,165,0.08)', 'rgba(74,111,165,0.3)', '#4a6fa5');
+      addSubChips(nodesG, leftCX, feCard.y + feCard.h + 60,
+        ['Dashboards'], 'rgba(74,111,165,0.08)', 'rgba(74,111,165,0.3)', '#4a6fa5');
+
+      // ── CENTER COLUMN ──
+
+      // Models layer
+      addLayerBox(nodesG, centerX, modelsY, centerW, modelsH, '#8b5cf6', 'rgba(139,92,246,0.06)', 'Models');
+      addChip(nodesG, centerCX - 90, modelsY + 20, 'Commercial', ['#8b5cf6', '#7c3aed'],
+        'Proprietary frontier models — Claude, GPT, Gemini, Cohere', '/resources/saas-vs-self-hosted');
+      addChip(nodesG, centerCX + 10, modelsY + 20, 'Open Source', ['#8b5cf6', '#7c3aed'],
+        'Open-weight models — Llama, Mistral, Qwen, DeepSeek, Phi', '/resources/saas-vs-self-hosted');
+      addChip(nodesG, centerCX + 110, modelsY + 20, 'Fine-Tuned', ['#a78bfa', '#8b5cf6'],
+        'Task-specific models fine-tuned on your data', '/resources/saas-vs-self-hosted');
+
+      // Inference layer
+      addLayerBox(nodesG, centerX, inferenceY, centerW, inferenceH, '#6366f1', 'rgba(99,102,241,0.06)', 'Inference');
+      addChip(nodesG, centerCX - 110, inferenceY + 20, 'Cloud APIs', ['#6366f1', '#4f46e5'],
+        'Hosted API endpoints — Anthropic, OpenAI, Google, AWS Bedrock', '/services/deployment');
+      addChip(nodesG, centerCX - 10, inferenceY + 20, 'Self-Hosted', ['#6366f1', '#4f46e5'],
+        'Running models on your own servers — vLLM, TGI, Ollama', '/services/deployment');
+      addChip(nodesG, centerCX + 85, inferenceY + 20, 'On-Prem', ['#6366f1', '#4f46e5'],
+        'Models in your data center — air-gapped, regulatory compliance', '/services/deployment');
+      addChip(nodesG, centerCX + 160, inferenceY + 20, 'Edge', ['#818cf8', '#6366f1'],
+        'Lightweight models on devices — low latency, offline', '/services/deployment');
+
+      // Agents layer
+      addLayerBox(nodesG, centerX, agentsY, centerW, agentsH, '#e85d26', 'rgba(232,93,38,0.06)', 'Agents', undefined, false, 'Backend');
+      addChip(nodesG, centerCX, agentsY + 20, 'Orchestration', ['#c94d1e', '#a83a10'],
+        'Coordination layer — routing tasks, handling failures, managing state', '/resources/what-is-pipeline-orchestration');
+      addChip(nodesG, centerCX - 80, agentsY + 52, 'Agents', ['#e85d26', '#c94d1e'],
+        'Autonomous AI systems that reason, plan, and act — execute MCP tools dynamically, choosing which tools to call based on context', '/resources/what-is-an-ai-agent');
+      addChip(nodesG, centerCX, agentsY + 52, 'Pipelines', ['#e85d26', '#c94d1e'],
+        'Defined multi-step processing chains — MCP tool calls are pre-determined and sequenced', '/resources/what-is-a-pipeline');
+      addChip(nodesG, centerCX + 80, agentsY + 52, 'Workflows', ['#e85d26', '#c94d1e'],
+        'Automated sequences triggered by events — MCP tool calls are pre-defined in the workflow steps', '/resources/what-is-a-workflow');
+
+      // ── MCP (central, its own prominent layer) ──
+      addLayerBox(nodesG, centerX, mcpLayerY, centerW, mcpLayerH, '#f5a623', 'rgba(245,166,35,0.08)', 'MCP', '#d4920e');
+      addChip(nodesG, centerCX, mcpLayerY + 16, 'Model Context Protocol', ['#f5a623', '#e09800'],
+        'The open standard for connecting AI models to external tools, services, and data sources', '/resources/what-is-mcp');
+
+      // ── HUMAN-IN-THE-LOOP checkpoint ──
+      const hitlG = nodesG.append('g');
+      const hitlW = 180;
+      hitlG.append('rect')
+        .attr('x', centerCX - hitlW / 2)
+        .attr('y', hitlY)
+        .attr('width', hitlW)
+        .attr('height', hitlH)
+        .attr('rx', 14)
+        .attr('fill', 'rgba(185,28,28,0.06)')
+        .attr('stroke', '#b91c1c')
+        .attr('stroke-width', 2)
+        .attr('stroke-dasharray', '4 3');
+      hitlG.append('text')
+        .attr('x', centerCX)
+        .attr('y', hitlY + hitlH / 2 + 1)
+        .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'middle')
+        .attr('fill', '#b91c1c')
+        .attr('font-family', 'var(--font-mono), monospace')
+        .attr('font-size', '9.5')
+        .attr('font-weight', '700')
+        .text('\u{1F6D1} HUMAN-IN-THE-LOOP');
+      hitlG
+        .on('mousemove', (evt: MouseEvent) => showTooltip(evt, 'Approval checkpoints where humans review and authorize agent actions before execution — the brakes on the system'))
+        .on('mouseleave', hideTooltip);
+
+      // ── INTEGRATIONS (Taking Actions target) ──
+      addLayerBox(nodesG, centerX, integrationsY, centerW, integrationsH, '#2563eb', 'rgba(37,99,235,0.05)', 'Integrations', '#2563eb', true);
+      addChip(nodesG, centerCX - 80, integrationsY + 22, 'Your Data', ['#2563eb', '#1d4ed8'],
+        'Connections to your data — Salesforce, HubSpot, Google Drive, Notion — via authenticated MCP servers', '/services/agentic-ai');
+      addChip(nodesG, centerCX + 70, integrationsY + 22, 'Search APIs', ['#2563eb', '#1d4ed8'],
+        'Web search, news feeds, and real-time data — typically API-key-based MCP integrations', '/services/agentic-ai');
+      addChip(nodesG, centerCX, integrationsY + 54, 'External Services', ['#2563eb', '#1d4ed8'],
+        'Third-party services and public integrations — weather, time, public datasets', '/services/agentic-ai');
+
+      // ── STORAGE (lower, with Postgres and Data Lakes) ──
+      addLayerBox(nodesG, centerX, storageY, centerW, storageH, '#14b8a6', 'rgba(20,184,166,0.06)', 'Storage');
+      addChip(nodesG, centerCX - 120, storageY + 18, 'Conversations', ['#14b8a6', '#0d9488'],
+        'Persisted conversation threads for auditing, replay, and continuity');
+      addChip(nodesG, centerCX - 15, storageY + 18, 'Outputs', ['#14b8a6', '#0d9488'],
+        'Generated text, structured data, files, and artifacts');
+      addChip(nodesG, centerCX + 75, storageY + 18, 'Prompts', ['#14b8a6', '#0d9488'],
+        'Prompt templates, system instructions, and versioned prompt libraries');
+      addChip(nodesG, centerCX - 80, storageY + 50, 'Postgres', ['#0d9488', '#0a7a6e'],
+        'Production relational databases — structured data, transactions, audit trails');
+      addChip(nodesG, centerCX + 70, storageY + 50, 'Data Lakes', ['#0d9488', '#0a7a6e'],
+        'Large-scale storage for unstructured data — logs, documents, embeddings, raw outputs');
+
+      // ── CONTEXT STORE (Knowledge) ──
+      addLayerBox(nodesG, centerX, knowledgeY, centerW, knowledgeH, 'rgba(37,99,235,0.4)', 'rgba(37,99,235,0.03)', 'Context Store', '#2563eb', true);
+      addChip(nodesG, centerCX - 65, knowledgeY + 25, 'Context (RAG)', ['#2563eb', '#1d4ed8'],
+        'Retrieval-Augmented Generation — grounding AI in your documents and knowledge bases', '/why-agents#assistants');
+      addChip(nodesG, centerCX + 75, knowledgeY + 25, 'Memory', ['#2563eb', '#1d4ed8'],
+        'Persistent memory — conversation history, user preferences, learned facts', '/services/agentic-ai');
+
+      // ── RIGHT COLUMN: Safety + Observability ──
+      const safetyCard = addCard(nodesG, rightCX, modelsY + 20, 130, 65,
+        ['#b91c1c', '#dc2626'], '\u{1F6E1}\uFE0F', 'Safety',
+        'Constraints and oversight mechanisms that keep agents operating within defined boundaries',
+        '/why-agents/safety-and-supervision'
+      );
+      addSubChips(nodesG, rightCX, safetyCard.y + safetyCard.h + 8,
+        ['Guardrails'], 'rgba(185,28,28,0.08)', 'rgba(185,28,28,0.3)', '#b91c1c');
+      addSubChips(nodesG, rightCX, safetyCard.y + safetyCard.h + 34,
+        ['Security Harnesses'], 'rgba(185,28,28,0.08)', 'rgba(185,28,28,0.3)', '#b91c1c');
+
+      const obsCard = addCard(nodesG, rightCX, agentsY - 10, 130, 65,
+        ['#065f46', '#047857'], '\u{1F4CA}', 'Observability',
+        'Tracking decisions, measuring quality, logging actions, and monitoring system health',
+        '/why-agents/safety-and-supervision'
+      );
+      addSubChips(nodesG, rightCX, obsCard.y + obsCard.h + 8,
+        ['Eval', 'Logging'], 'rgba(6,95,70,0.08)', 'rgba(6,95,70,0.3)', '#065f46');
+      addSubChips(nodesG, rightCX, obsCard.y + obsCard.h + 34,
+        ['Monitoring'], 'rgba(6,95,70,0.08)', 'rgba(6,95,70,0.3)', '#065f46');
+
+      // ── RIGHT COLUMN (lower): Storage destinations ──
+      const destX = rightCX;
+      const promptLibChip = addChip(nodesG, destX, storageY + 4, 'Prompt Library', ['#4a6fa5', '#3d5f8a'],
+        'Versioned, searchable library of prompt templates — reusable system prompts, few-shot examples, and tested instructions');
+      const wikiChip = addChip(nodesG, destX, storageY + 38, 'Wiki / KM', ['#14b8a6', '#0d9488'],
+        'Knowledge management — curated outputs become documentation, SOPs, and institutional knowledge');
+      const dwChip = addChip(nodesG, destX, storageY + 72, 'Data Warehouse', ['#6366f1', '#4f46e5'],
+        'Structured storage for analytics, data mining, compliance auditing, and business intelligence');
+
+      // ══════════════════════════════════
+      // ── CONNECTIONS / ARROWS ──
+      // ══════════════════════════════════
+
+      // Vertical stack: Models → Inference → Agents
+      drawConnection(arrowsG, centerCX, modelsY + modelsH, centerCX, inferenceY, '#8b5cf6');
+      drawConnection(arrowsG, centerCX, inferenceY + inferenceH, centerCX, agentsY, '#6366f1');
+
+      // Agents → MCP
+      drawConnection(arrowsG, centerCX, agentsY + agentsH, centerCX, mcpLayerY, '#e85d26');
+
+      // MCP → HITL (with "Taking Actions" label to the right)
+      drawConnection(arrowsG, centerCX, mcpLayerY + mcpLayerH, centerCX, hitlY, '#f5a623', { noArrow: true });
+
+      // "TAKING ACTIONS" label between MCP and HITL
+      arrowsG.append('text')
+        .attr('x', centerCX + 75)
+        .attr('y', (mcpLayerY + mcpLayerH + hitlY) / 2 + 2)
+        .attr('text-anchor', 'start')
+        .attr('fill', '#f5a623')
+        .attr('font-family', 'var(--font-mono), monospace')
+        .attr('font-size', '9')
+        .attr('font-weight', '700')
+        .attr('letter-spacing', '0.05em')
+        .text('TAKING ACTIONS');
+
+      // HITL → Integrations
+      drawConnection(arrowsG, centerCX, hitlY + hitlH, centerCX, integrationsY, '#b91c1c');
+
+      // Agents → Storage (side path, dashed — agents persist data)
+      drawConnection(arrowsG, centerCX + 100, agentsY + agentsH, centerCX + 100, storageY, '#14b8a6', { dashed: true, opacity: 0.45 });
+
+      // Storage → Context Store (labeled "Context-Mining")
+      drawConnection(arrowsG, centerCX, storageY + storageH, centerCX, knowledgeY, '#2563eb', { dashed: true, label: 'CONTEXT-MINING' });
+
+      // Context Store → feeds back up to Agents (virtuous cycle)
+      arrowsG.append('path')
+        .attr('d', `M${centerX - 4},${knowledgeY + knowledgeH / 2} C${centerX - 55},${knowledgeY + knowledgeH / 2} ${centerX - 55},${agentsY + agentsH / 2} ${centerX},${agentsY + agentsH / 2}`)
+        .attr('fill', 'none')
+        .attr('stroke', '#2563eb')
+        .attr('stroke-width', 1.5)
+        .attr('stroke-dasharray', '4 3')
+        .attr('opacity', 0.45);
+      // Arrowhead pointing right into agents
+      arrowsG.append('polygon')
+        .attr('points', `${centerX},${agentsY + agentsH / 2} ${centerX - 7},${agentsY + agentsH / 2 + 4} ${centerX - 7},${agentsY + agentsH / 2 - 4}`)
+        .attr('fill', '#2563eb')
+        .attr('opacity', 0.45);
+
+      // Safety → Agents (horizontal)
+      drawConnection(arrowsG, rightCX - 65, safetyCard.cy, centerX + centerW, agentsY + 30, '#b91c1c', { curved: 'horizontal' });
+
+      // Observability → Agents (horizontal)
+      drawConnection(arrowsG, rightCX - 65, obsCard.cy, centerX + centerW, agentsY + 55, '#065f46', { curved: 'horizontal' });
+
+      // ── Storage → Destination arrows ──
+      // Prompts → Prompt Library
+      drawConnection(arrowsG, centerCX + 75 + 40, storageY + 18 + 14, destX - promptLibChip.w / 2 - 4, promptLibChip.cy, '#4a6fa5', { curved: 'horizontal', dashed: true, opacity: 0.5 });
+
+      // Outputs → Wiki / KM
+      drawConnection(arrowsG, centerCX - 15 + 45, storageY + 18 + 14, destX - wikiChip.w / 2 - 4, wikiChip.cy, '#14b8a6', { curved: 'horizontal', dashed: true, opacity: 0.5 });
+
+      // Outputs → Data Warehouse
+      drawConnection(arrowsG, centerCX - 15 + 45, storageY + 18 + 14, destX - dwChip.w / 2 - 4, dwChip.cy, '#6366f1', { curved: 'horizontal', dashed: true, opacity: 0.5 });
+
+      // Postgres → Context Store (vector store / RAG)
+      drawConnection(arrowsG, centerCX - 80, storageY + 50 + 28, centerCX - 65, knowledgeY, '#0d9488', { dashed: true, opacity: 0.5 });
+
+      // ── INPUT / OUTPUT flow cycle ──
+      // INPUT: Frontends → Prompt Layer
+      const inX1 = leftCX + 65;
+      const inY1 = feCard.y + feCard.h * 0.3;
+      const inX2 = centerCX - 20;
+      const inY2 = promptLayerY;
+
+      arrowsG.append('path')
+        .attr('d', `M${inX1},${inY1} C${inX1 + 40},${inY1} ${inX2},${inY1} ${inX2},${inY2}`)
+        .attr('fill', 'none')
+        .attr('stroke', '#4a6fa5')
+        .attr('stroke-width', 2)
+        .attr('stroke-dasharray', '6 3')
+        .attr('opacity', 0.6);
+      arrowsG.append('polygon')
+        .attr('points', `${inX2},${inY2} ${inX2-5},${inY2+8} ${inX2+5},${inY2+8}`)
+        .attr('fill', '#4a6fa5')
+        .attr('opacity', 0.6);
+      arrowsG.append('text')
+        .attr('x', (inX1 + inX2) / 2 + 15).attr('y', inY1 - 6)
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#4a6fa5')
+        .attr('font-family', 'var(--font-mono), monospace')
+        .attr('font-size', '9')
+        .attr('font-weight', '700')
+        .text('INPUT');
+
+      // OUTPUT: Agents → Frontends
+      const outX1 = centerX;
+      const outY1 = agentsY + agentsH * 0.65;
+      const outX2 = leftCX + 65;
+      const outY2 = feCard.y + feCard.h * 0.7;
+
+      arrowsG.append('path')
+        .attr('d', `M${outX1},${outY1} C${(outX1+outX2)/2},${outY1} ${(outX1+outX2)/2},${outY2} ${outX2},${outY2}`)
+        .attr('fill', 'none')
+        .attr('stroke', '#e85d26')
+        .attr('stroke-width', 2)
+        .attr('stroke-dasharray', '6 3')
+        .attr('opacity', 0.6);
+      arrowsG.append('polygon')
+        .attr('points', `${outX2},${outY2} ${outX2+7},${outY2-4} ${outX2+7},${outY2+4}`)
+        .attr('fill', '#e85d26')
+        .attr('opacity', 0.6);
+      arrowsG.append('text')
+        .attr('x', (outX1 + outX2) / 2).attr('y', outY1 + 14)
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#e85d26')
+        .attr('font-family', 'var(--font-mono), monospace')
+        .attr('font-size', '9')
+        .attr('font-weight', '700')
+        .text('OUTPUT');
+    });
+  }
+
+  // Run on page load and Astro navigation
+  document.addEventListener('astro:page-load', initD3Diagram);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initD3Diagram);
+  } else {
+    initD3Diagram();
+  }
+</script>
