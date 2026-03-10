@@ -1,0 +1,232 @@
+%%{ init: { 'theme': 'base', 'themeVariables': { 'fontSize': '14px' } } }%%
+flowchart TD
+
+    %% === FRONTENDS ===
+    subgraph frontends_layer["Frontends"]
+        frontends-card["Frontends<br/><small>Chatbots · Slack · Telegram<br/>Web UIs · Dashboards</small>"]
+    end
+
+    %% === PROMPTS ===
+    subgraph prompts_layer["Prompts"]
+        user-prompt["User Prompt"]
+        system-prompt["System Prompt"]
+        vendor-prompt["Vendor Prompt"]
+    end
+
+    %% === MODELS ===
+    subgraph models_layer["Models"]
+        commercial-models["Commercial"]
+        open-source-models["Open Source"]
+        fine-tuned-models["Fine-Tuned"]
+        embedding-models["Embedding"]
+    end
+
+    %% === INFERENCE ===
+    subgraph inference_layer["Inference"]
+        model-gateway["Gateway"]
+        cloud-apis["Cloud APIs"]
+        self-hosted["Self-Hosted"]
+        on-prem["On-Prem"]
+        edge-compute["Edge"]
+        prompt-cache["Cache"]
+    end
+
+    %% === CONTEXT STORE ===
+    subgraph context_store_layer["Context Store"]
+        context-rag["Context (RAG)"]
+        memory["Memory"]
+        vector-store["Vector Store"]
+    end
+
+    %% === AGENTS ===
+    subgraph agents_layer["Agents"]
+        orchestration["Orchestration"]
+        agents-node["Agents"]
+        pipelines["Pipelines"]
+        workflows["Workflows"]
+    end
+
+    %% === MCP ===
+    subgraph mcp_layer["MCP"]
+        mcp-protocol["Model Context Protocol"]
+        tool-registry["Tool Registry"]
+    end
+
+    %% === HUMAN-IN-THE-LOOP ===
+    subgraph hitl_layer["Human-in-the-Loop"]
+        hitl-checkpoint["Human-in-the-Loop"]
+    end
+
+    %% === ACTIONS ===
+    subgraph actions_layer["Actions"]
+        your-data["Your Data"]
+        external-services["External Services"]
+        digital-wallets["Digital Wallets"]
+    end
+
+    %% === SAFETY ===
+    subgraph safety_layer["Safety"]
+        safety-card["Safety<br/><small>Guardrails · Security Harnesses<br/>Input Filtering</small>"]
+    end
+
+    %% === OBSERVABILITY ===
+    subgraph observability_layer["Observability"]
+        observability-card["Observability<br/><small>Eval · Logging · Monitoring</small>"]
+    end
+
+    %% === GROUNDING ===
+    subgraph grounding_layer["Grounding"]
+        grounding-card["Grounding<br/><small>Web Search · News Feeds<br/>Real-Time Data</small>"]
+    end
+
+    %% === STORAGE ===
+    subgraph storage_layer["Storage"]
+        conversations["Conversations"]
+        outputs["Outputs"]
+        stored-prompts["Prompts"]
+        postgres["Postgres"]
+        data-lakes["Data Lakes"]
+    end
+
+    %% === DESTINATIONS ===
+    subgraph destinations_layer["Destinations"]
+        prompt-library["Prompt Library"]
+        wiki-km["Wiki / KM"]
+        data-warehouse["Data Warehouse"]
+    end
+
+    %% === CONNECTIONS ===
+
+    %% Input flow
+    frontends-card -. "INPUT" .-> user-prompt
+
+    %% Prompts to Models
+    prompts_layer --> models_layer
+
+    %% Models to Inference
+    models_layer --> inference_layer
+
+    %% Gateway routing
+    model-gateway --> cloud-apis
+    model-gateway --> self-hosted
+
+    %% Direct inference
+    models_layer -. "DIRECT" .-> cloud-apis
+    models_layer -. "DIRECT" .-> self-hosted
+
+    %% Inference to Agents
+    inference_layer --> agents_layer
+
+    %% Orchestration dispatching
+    orchestration -. dispatch .-> agents-node
+    orchestration -. dispatch .-> pipelines
+    orchestration -. dispatch .-> workflows
+
+    %% Agentic loop
+    agents-node -. "AGENTIC LOOP" .-> inference_layer
+
+    %% Agents/Pipelines/Workflows to MCP
+    agents-node -- "AUTONOMOUS" --> mcp-protocol
+    pipelines -- "DETERMINISTIC" --> mcp-protocol
+    workflows -- "DETERMINISTIC" --> mcp-protocol
+
+    %% MCP to HITL to Actions
+    mcp-protocol -- "TAKING ACTIONS" --- hitl-checkpoint
+    hitl-checkpoint --> actions_layer
+
+    %% Data retrieval
+    actions_layer -. "DATA RETRIEVAL" .-> mcp-protocol
+
+    %% Agents to Storage
+    agents_layer -. persist .-> storage_layer
+
+    %% Storage to Context
+    storage_layer -. "CONTEXT-MINING" .-> context_store_layer
+
+    %% Context to Agents
+    context_store_layer -. context .-> agents_layer
+
+    %% Ad-hoc memory
+    agents-node -. "AD-HOC MEMORY" .-> memory
+
+    %% Grounding
+    grounding-card -. "GROUNDING" .-> agents_layer
+
+    %% Output flow
+    agents-node -. "OUTPUT" .-> frontends-card
+
+    %% Safety
+    safety-card --> agents_layer
+    safety-card -. input filter .-> prompts_layer
+    safety-card -. tool constraints .-> mcp-protocol
+
+    %% Observability
+    observability-card --> agents_layer
+    observability-card -. logs .-> data-lakes
+    observability-card -. "PROMPT OPTIMIZATION" .-> stored-prompts
+    frontends-card -. telemetry .-> observability-card
+
+    %% Context injection
+    context-rag -. "CONTEXT INJECTION" .-> system-prompt
+
+    %% Embedding to vector store
+    embedding-models -. embed .-> vector-store
+
+    %% Storage to Destinations
+    stored-prompts -. curate .-> prompt-library
+    outputs -. publish .-> wiki-km
+    outputs -. archive .-> data-warehouse
+
+    %% Postgres to context
+    postgres -. index .-> context-rag
+
+    %% User prompt to conversations
+    user-prompt -. persist .-> conversations
+
+    %% Conversations to postgres
+    conversations -. "USER CONTEXT MINING" .-> postgres
+
+    %% === STYLES ===
+    classDef promptsStyle fill:#4a6fa5,stroke:#3a5f95,color:white
+    classDef modelsStyle fill:#8b5cf6,stroke:#7b4ce6,color:white
+    classDef inferenceStyle fill:#6366f1,stroke:#5356e1,color:white
+    classDef agentsStyle fill:#e85d26,stroke:#d84d16,color:white
+    classDef mcpStyle fill:#f5a623,stroke:#e59613,color:white
+    classDef hitlStyle fill:#b91c1c,stroke:#a90c0c,color:white
+    classDef actionsStyle fill:#2563eb,stroke:#1553db,color:white
+    classDef storageStyle fill:#14b8a6,stroke:#04a896,color:white
+    classDef contextStyle fill:#2563eb,stroke:#1553db,color:white
+    classDef safetyStyle fill:#b91c1c,stroke:#a90c0c,color:white
+    classDef observabilityStyle fill:#065f46,stroke:#004f36,color:white
+    classDef groundingStyle fill:#0891b2,stroke:#0081a2,color:white
+    classDef destinationsStyle fill:#7c3aed,stroke:#6c2add,color:white
+
+    class frontends-card promptsStyle
+    class user-prompt,system-prompt,vendor-prompt promptsStyle
+    class commercial-models,open-source-models,fine-tuned-models,embedding-models modelsStyle
+    class model-gateway,cloud-apis,self-hosted,on-prem,edge-compute,prompt-cache inferenceStyle
+    class orchestration,agents-node,pipelines,workflows agentsStyle
+    class mcp-protocol,tool-registry mcpStyle
+    class hitl-checkpoint hitlStyle
+    class your-data,external-services,digital-wallets actionsStyle
+    class conversations,outputs,stored-prompts,postgres,data-lakes storageStyle
+    class context-rag,memory,vector-store contextStyle
+    class safety-card safetyStyle
+    class observability-card observabilityStyle
+    class grounding-card groundingStyle
+    class prompt-library,wiki-km,data-warehouse destinationsStyle
+
+    style frontends_layer fill:none,stroke:#4a6fa5,stroke-width:2px
+    style prompts_layer fill:none,stroke:#4a6fa5,stroke-width:2px
+    style models_layer fill:none,stroke:#8b5cf6,stroke-width:2px
+    style inference_layer fill:none,stroke:#6366f1,stroke-width:2px
+    style context_store_layer fill:none,stroke:#2563eb,stroke-width:2px,stroke-dasharray:5 5
+    style agents_layer fill:none,stroke:#e85d26,stroke-width:2px
+    style mcp_layer fill:none,stroke:#f5a623,stroke-width:2px
+    style hitl_layer fill:none,stroke:#b91c1c,stroke-width:2px
+    style actions_layer fill:none,stroke:#2563eb,stroke-width:2px,stroke-dasharray:5 5
+    style safety_layer fill:none,stroke:#b91c1c,stroke-width:2px
+    style observability_layer fill:none,stroke:#065f46,stroke-width:2px
+    style grounding_layer fill:none,stroke:#0891b2,stroke-width:2px
+    style storage_layer fill:none,stroke:#14b8a6,stroke-width:2px
+    style destinations_layer fill:none,stroke:#7c3aed,stroke-width:2px

@@ -1,0 +1,149 @@
+digraph AgenticAIArchitectureERD {
+    rankdir=LR;
+    fontname="Helvetica";
+    fontsize=14;
+    label="Agentic AI Architecture — Entity Relationship Diagram v2.1.0";
+    labelloc=t;
+    nodesep=0.5;
+    ranksep=1.2;
+    node [fontname="Helvetica", fontsize=10, shape=record, style=filled];
+    edge [fontname="Helvetica", fontsize=8];
+
+    // === LAYERS AS RECORD NODES ===
+
+    frontends [
+        label="{Frontends|• Frontends\l  (Chatbots, Slack, Telegram,\l   Web UIs, Dashboards)\l}",
+        fillcolor="#4a6fa5",
+        fontcolor="white"
+    ];
+
+    prompts [
+        label="{Prompts|• User Prompt\l• System Prompt\l• Vendor Prompt\l}",
+        fillcolor="#4a6fa5",
+        fontcolor="white"
+    ];
+
+    models [
+        label="{Models|• Commercial\l• Open Source\l• Fine-Tuned\l• Embedding\l}",
+        fillcolor="#8b5cf6",
+        fontcolor="white"
+    ];
+
+    inference [
+        label="{Inference|• Gateway\l• Cloud APIs\l• Self-Hosted\l• On-Prem\l• Edge\l• Cache\l}",
+        fillcolor="#6366f1",
+        fontcolor="white"
+    ];
+
+    context_store [
+        label="{Context Store|• Context (RAG)\l• Memory\l• Vector Store\l}",
+        fillcolor="#2563eb",
+        fontcolor="white"
+    ];
+
+    agents [
+        label="{Agents|• Orchestration\l• Agents\l• Pipelines\l• Workflows\l}",
+        fillcolor="#e85d26",
+        fontcolor="white"
+    ];
+
+    mcp [
+        label="{MCP|• Model Context Protocol\l• Tool Registry\l}",
+        fillcolor="#f5a623",
+        fontcolor="white"
+    ];
+
+    hitl [
+        label="{Human-in-the-Loop|• Approval Checkpoint\l}",
+        fillcolor="#b91c1c",
+        fontcolor="white"
+    ];
+
+    actions [
+        label="{Actions|• Your Data\l• External Services\l• Digital Wallets\l}",
+        fillcolor="#2563eb",
+        fontcolor="white"
+    ];
+
+    storage [
+        label="{Storage|• Conversations\l• Outputs\l• Prompts\l• Postgres\l• Data Lakes\l}",
+        fillcolor="#14b8a6",
+        fontcolor="white"
+    ];
+
+    destinations [
+        label="{Destinations|• Prompt Library\l• Wiki / KM\l• Data Warehouse\l}",
+        fillcolor="#7c3aed",
+        fontcolor="white"
+    ];
+
+    safety [
+        label="{Safety|• Guardrails\l• Security Harnesses\l• Input Filtering\l}",
+        fillcolor="#b91c1c",
+        fontcolor="white"
+    ];
+
+    observability [
+        label="{Observability|• Eval\l• Logging\l• Monitoring\l}",
+        fillcolor="#065f46",
+        fontcolor="white"
+    ];
+
+    grounding [
+        label="{Grounding|• Web Search\l• News Feeds\l• Real-Time Data\l}",
+        fillcolor="#0891b2",
+        fontcolor="white"
+    ];
+
+    // === RELATIONSHIPS ===
+
+    // Core flow (top-to-bottom in original)
+    frontends -> prompts [label="INPUT", style=dashed, color="#4a6fa5"];
+    prompts -> models [label="assembled\nprompts", color="#4a6fa5"];
+    models -> inference [label="model\nserving", color="#8b5cf6"];
+    inference -> agents [label="inference\nresults", color="#6366f1"];
+
+    // Agent dispatching and tool use
+    agents -> mcp [label="AUTONOMOUS /\nDETERMINISTIC", color="#e85d26"];
+    agents -> inference [label="AGENTIC\nLOOP", style=dashed, color="#e85d26"];
+
+    // MCP to HITL to Actions
+    mcp -> hitl [label="TAKING\nACTIONS", color="#f5a623"];
+    hitl -> actions [label="approved\nactions", color="#b91c1c"];
+    actions -> mcp [label="DATA\nRETRIEVAL", style=dashed, color="#2563eb"];
+
+    // Storage and persistence
+    agents -> storage [label="persist", style=dashed, color="#14b8a6"];
+    storage -> context_store [label="CONTEXT-\nMINING", style=dashed, color="#2563eb"];
+    context_store -> agents [label="context\nfeed", style=dashed, color="#2563eb"];
+    context_store -> prompts [label="CONTEXT\nINJECTION", style=dashed, color="#2563eb"];
+
+    // Memory
+    agents -> context_store [label="AD-HOC\nMEMORY", style=dashed, color="#2563eb"];
+
+    // Embedding
+    models -> context_store [label="embedding\nvectors", style=dashed, color="#8b5cf6"];
+
+    // Destinations
+    storage -> destinations [label="curate /\npublish", style=dashed, color="#7c3aed"];
+
+    // Cross-cutting concerns
+    safety -> agents [label="constraints", color="#b91c1c"];
+    safety -> prompts [label="input\nfiltering", style=dashed, color="#b91c1c"];
+    safety -> mcp [label="tool\nconstraints", style=dashed, color="#b91c1c"];
+
+    observability -> agents [label="monitor", color="#065f46"];
+    observability -> storage [label="logs &\nmetrics", style=dashed, color="#065f46"];
+    observability -> prompts [label="PROMPT\nOPTIMIZATION", style=dashed, color="#065f46"];
+
+    // Grounding and output
+    grounding -> agents [label="GROUNDING", style=dashed, color="#0891b2"];
+    agents -> frontends [label="OUTPUT", style=dashed, color="#e85d26"];
+    frontends -> observability [label="telemetry", style=dashed, color="#4a6fa5"];
+
+    // Postgres to context
+    storage -> context_store [label="postgres\nindexing", style=dashed, color="#14b8a6"];
+
+    // User prompt persistence
+    prompts -> storage [label="persist\nprompts", style=dashed, color="#4a6fa5"];
+}
